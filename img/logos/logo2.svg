@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="17mm"
+   height="12.6mm"
+   viewBox="0 0 17 12.6"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="logo2.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#000000"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="8"
+     inkscape:cx="38.1875"
+     inkscape:cy="16.875"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Слой 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       aria-label="MF"
+       id="text6913"
+       style="font-style:italic;font-size:9.87777px;-inkscape-font-specification:'sans-serif, Italic';text-align:center;text-anchor:middle;fill:#ff0000;stroke-width:0.264583"
+       transform="translate(-19.72137,-31.666218)">
+      <path
+         d="m 28.43677,38.857611 -0.385241,-0.0028 1.418001,-6.101259 c 0,0 -1.876627,2.396413 -3.017792,4.0018 -0.09645,0.135687 -0.320016,0.129099 -0.3529,-3e-6 -0.32219,-1.264878 -1.090479,-4.300789 -1.090479,-4.300789 l -1.495395,6.400248 h -0.901925 l 1.659156,-7.18164 c 0,0 1.417443,-0.03897 1.567058,0.06765 0.149615,0.106623 0.681017,3.708953 0.681017,3.708953 0,0 1.262811,-1.920063 2.3393,-3.504071 0.248615,-0.365826 1.817742,-0.233719 1.817742,-0.233719 z"
+         style="fill:#ffffff"
+         id="path7285"
+         sodipodi:nodetypes="cccsscccczcscc" />
+      <path
+         d="m 34.023717,32.33149 c -0.438891,0.102092 -3.485858,0.05489 -3.485858,0.05489 l -0.369523,1.934615 3.211245,0.04026 c 0,0 -0.29007,0.727193 -0.615805,0.845522 -0.321333,0.116729 -2.763037,0.120568 -2.763037,0.120568 0,0 -0.534697,3.162118 -1.021088,3.44913 -0.16094,0.09497 -0.555455,0.07587 -0.555455,0.07587 l 2.037997,-7.147701 3.90162,-0.03136 c 0,0 -0.09956,0.602255 -0.340096,0.658208 z"
+         style="fill:#ffffff"
+         id="path7287"
+         sodipodi:nodetypes="scccscscccs" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-size:9.87777px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Italic';text-align:center;text-anchor:middle;fill:#ffffff;stroke-width:0.264583"
+       x="8.4883633"
+       y="12.562772"
+       id="text2838"><tspan
+         sodipodi:role="line"
+         id="tspan2836"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:Haettenschweiler;-inkscape-font-specification:'Haettenschweiler, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;stroke-width:0.264583"
+         x="8.4883633"
+         y="12.562772">МЕТАФОРМА</tspan></text>
+  </g>
+</svg>
