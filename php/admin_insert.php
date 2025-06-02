@@ -1,0 +1,28 @@
+<?php
+require_once './db.php';
+
+$table = $_POST['table'] ?? '';
+$allowedTables = ['products', 'descriptions', 'images', 'users', 'cart', 'favs', 'review'];
+if (!in_array($table, $allowedTables)) {
+    echo "invalid table";
+    exit;
+}
+
+try {
+    $columns = $pdo->query("DESCRIBE `$table`")->fetchAll(PDO::FETCH_COLUMN);
+    $insertCols = array_filter($columns, fn($col) => $col !== 'id');
+
+    $placeholders = array_map(fn($col) => ":$col", $insertCols);
+    $sql = "INSERT INTO `$table` (" . implode(',', $insertCols) . ") VALUES (" . implode(',', $placeholders) . ")";
+    $stmt = $pdo->prepare($sql);
+
+    $data = [];
+    foreach ($insertCols as $col) {
+        $data[":$col"] = $_POST[$col] ?? null;
+    }
+
+    $stmt->execute($data);
+    echo "success";
+} catch (PDOException $e) {
+    echo "DB error: " . $e->getMessage();
+}

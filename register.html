@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="./img/logos/logo1.svg">
+    <title>Главная</title>
+</head>
+<body>
+    <header class="header_landing">
+        
+    </header>
+    <main class="register center">
+        <nav class="link_tree">
+            <a href="index.html">Главная</a>
+            <p class="link_tree_arrow">&#10095;</p>
+            <p>Регистрация</p>
+        </nav>
+        <form class="register_form">
+            <h1 for="">Регистрация</h1>
+            <label for="">Ваше имя</label>
+            <input class="reg_name" type="text" name="name" placeholder="Name" required>
+            <p class="reg_name_error error_msg">Пожалуйста введите ваше имя</p>
+            <label for="">Ваша почта</label>
+            <input class="reg_email" type="email" name="email" placeholder="Email" required>
+            <p class="reg_email_error error_msg">Пожалуйста введите вашу почту</p>
+            <label for="">Ваш телефон</label>
+            <input class="reg_phone" type="tel" name="phone" placeholder="Phone" required>
+            <p class="reg_phone_error error_msg">Пожалуйста введите ваш телефон</p>
+            <label for="">Ваша дата рождения</label>
+            <input class="reg_date" type="date" name="birth" required max="2008-12-31">
+            <p class="reg_date_error error_msg">Пожалуйста введите вашу дату рождения</p>
+            <label for="">Ваш пол</label>
+            <select name="gender" required>
+                <option value="Мужчина">Мужчина</option>
+                <option value="Женщина">Женщина</option>
+            </select>
+            <label for="">Придумайте пароль</label>
+            <input class="reg_pass" type="password" name="pass" placeholder="Password" required>
+            <p class="reg_pass_error error_msg">Пожалуйста введите ваш пароль</p>
+            <label for="">Повторите пароль</label>
+            <input class="reg_Rpass" type="password" name="Rpass" placeholder="Password" required>
+            <p class="reg_Rpass_error error_msg">Пожалуйста повторите ваш пароль</p>
+            <button type="submit">Зарегестрироваться</button>
+        </form>
+        <div class="error_msg" id=""></div>
+    </main>
+    
+    <footer class="footer center">
+        
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

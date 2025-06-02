@@ -2,15 +2,15 @@
 require_once 'db.php';
 
 $filters = [];
+$columns = ['Type', 'Category', 'Size', 'Flavour'];
 
-$columns = ['Type', 'Category', 'Size'];
 foreach ($columns as $col) {
-    $stmt = $conn->prepare("SELECT DISTINCT `$col` FROM Products WHERE `$col` IS NOT NULL AND `$col` != ''");
+    $stmt = $pdo->prepare("SELECT DISTINCT `$col` FROM Products WHERE `$col` IS NOT NULL AND `$col` != ''");
     $stmt->execute();
-    $result = $stmt->get_result();
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $values = [];
-    while ($row = $result->fetch_assoc()) {
+    foreach ($rows as $row) {
         $values[] = $row[$col];
     }
 
@@ -18,4 +18,3 @@ foreach ($columns as $col) {
 }
 
 echo json_encode($filters);
-

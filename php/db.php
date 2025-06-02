@@ -2,6 +2,11 @@
 $host = 'MySQL-8.4';
 $db = 'MF';
 $user = 'root';
-$pass = ''; // adjust accordingly
+$pass = '';
 
-$conn = new mysqli($host, $user, $pass, $db);
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}

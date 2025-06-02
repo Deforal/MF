@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="./img/logos/logo1.svg">
+    <title>Главная</title>
+</head>
+<body>
+    <header class="header_landing">
+        
+    </header>
+    <main class="product center">
+        <nav class="link_tree">
+            <a href="index.html">Главная</a>
+            <p class="link_tree_arrow">&#10095;</p>
+            <a href="catalog.html">Каталог</a>
+            <p class="link_tree_arrow">&#10095;</p>
+            <p><p>
+        </nav>
+        <section class="product__top">
+            <div class="product__top_left">
+                <div class="product__imges">
+                    <img src="./img/catalog/id-1/0.webp" alt="">
+                </div>
+                <div class="product__overview">
+                    <section>
+                        <a href="">Обзор <span><</span></a>
+                        <div>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, error!</div>
+                    </section>
+                    <section>
+                        <a href="">Преимущества <span><</span></a>
+                        <div>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, error!</div>
+                    </section>
+                    <section>
+                        <a href="">Как принимать <span><</span></a>
+                        <div>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, error!</div>
+                    </section>
+                </div>
+            </div>
+            <div class="product__top_right">
+                <h1>Lorem ipsum dolor sit amet consectetur.</h1>
+                <div class="product__rating">rating</div>
+                <ul class="product_listBenef">
+                </ul>
+                <div class="product__flavour">
+                    <label for="">Вкус</label>
+                    <!-- new -->
+                    <select id="flavour-select"></select>
+                    
+                </div>
+                <!-- new -->
+                <div class="product__size" style="display: none;">
+                    <label for="">Вес</label>
+                    <div id="size-buttons"></div>
+                </div>
+                <!-- new -->
+                <p class="product__price" id="price-section" style="display: none;">
+                    <span class="before" style="display: none;"></span>
+                    <span class="after"></span>
+                </p>
+                <!-- new -->
+                <div class="product__amount">
+                    <label for="">Количество</label>
+                    <div class="product__amount_bottom">
+                        <div class="product__amount_amount">
+                            <button id="qty-minus">-</button>
+                            <input type="number" id="qty-input" min="1" max="50" value="1">
+                            <button id="qty-plus">+</button>
+                        </div>
+                        <button class="product__order">В корзину</button>
+                    </div>
+                    <p id="qty-error" class="error-msg" style="display:none; color:red;">Максимум 50</p>
+                </div>
+                
+            </div>
+        </section>
+        <section class="product__bottom"></section>
+    </main>
+
+    <footer class="footer center">
+        
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

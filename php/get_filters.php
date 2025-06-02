@@ -1,32 +1,25 @@
 <?php
 require_once "db.php";
-function getFilterOptions($conn, $column)
+
+function getFilterOptions($pdo, $column)
 {
-    $query = "SELECT `$column`, COUNT(*) as count FROM Products GROUP BY `$column`";
-    $stmt = $conn->prepare($query);
-
-    if (!$stmt) {
-        die("Prepare failed for column `$column`: " . $conn->error);
-    }
-
+    $stmt = $pdo->prepare("SELECT `$column`, COUNT(*) as count FROM Products GROUP BY `$column`");
     $stmt->execute();
-    $result = $stmt->get_result();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $options = [];
-    while ($row = $result->fetch_assoc()) {
+    foreach ($results as $row) {
         $options[] = ['value' => $row[$column], 'count' => $row['count']];
     }
     return $options;
 }
 
-// Retrieve filter options
 $filters = [
-    'Flavour' => getFilterOptions($conn, 'Flavour'),
-    'Size' => getFilterOptions($conn, 'Size'),
-    'Category' => getFilterOptions($conn, 'Category'),
-    'Type' => getFilterOptions($conn, 'Type')
+    'Вкус' => getFilterOptions($pdo, 'Flavour'),
+    'Вес' => getFilterOptions($pdo, 'Size'),
+    'Категория' => getFilterOptions($pdo, 'Category'),
+    'Тип' => getFilterOptions($pdo, 'Type')
 ];
 
-// Return as JSON
 header('Content-Type: application/json');
 echo json_encode($filters);

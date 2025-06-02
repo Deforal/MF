@@ -15,6 +15,24 @@
   font-family: "Montserrat", sans-serif;
 }
 
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+select {
+  appearance: none; /* Chrome */
+  -moz-appearance: none; /* Firefox */
+  -webkit-appearance: none; /* Safari */
+  padding-right: 2rem; /* leave space for the fake arrow */
+  background-size: 12px;
+}
+
 .center {
   padding-left: calc(50vw - 670px);
   padding-right: calc(50vw - 670px);
@@ -55,6 +73,7 @@
   display: flex;
 }
 .header_top_right_cart_p {
+  display: none;
   position: relative;
   top: 0px;
   left: -6px;
@@ -65,6 +84,10 @@
   padding: 0;
   border-radius: 8px;
   text-align: center;
+  font-weight: 700;
+}
+.header_top_right_cart_p.display {
+  display: block;
 }
 .header_bottom {
   display: flex;
@@ -83,6 +106,41 @@
   font-family: "Russo One", sans-serif;
   font-size: 14px;
   font-weight: 300;
+}
+
+.link_like {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.profile_dropdown,
+.cart_dropdown {
+  position: absolute;
+  top: 95%;
+  right: 95%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  border-top-right-radius: 0;
+  padding: 10px;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.profile_dropdown .link_like,
+.cart_dropdown .link_like {
+  cursor: pointer;
+  padding: 5px 0;
+  font-size: 20px;
+  color: #000;
+  text-decoration: none;
+}
+
+.profile_icon_wrapper,
+.header_top_right_cart {
+  position: relative;
 }
 
 .dropdown {
@@ -513,6 +571,47 @@
   padding-bottom: 15px;
   margin-bottom: 10px;
 }
+.catalog__side_menu #filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.catalog__side_menu #filters fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-sizing: border-box;
+  padding: 10px;
+}
+.catalog__side_menu #filters fieldset legend {
+  font-size: 20px;
+  font-weight: 600;
+}
+.catalog__side_menu #filters fieldset label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: -moz-fit-content;
+  width: fit-content;
+  padding: 5px;
+  transition: all ease-in-out;
+}
+.catalog__side_menu #filters fieldset label:hover {
+  background-color: #000000;
+  color: #fff;
+}
+.catalog__side_menu button {
+  height: 60px;
+  background-color: black;
+  border: none;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.catalog__side_menu button:active {
+  scale: 0.95;
+}
 .catalog__products {
   display: flex;
 }
@@ -532,6 +631,16 @@
 .catalog__products_header p {
   font-size: 18px;
 }
+.catalog__products_header select {
+  height: 40px;
+  box-sizing: border-box;
+  padding: 5px;
+  border: 2px solid #bfbfbf;
+  font-size: 16px;
+}
+.catalog__products_header select:hover {
+  border: #000 2px solid;
+}
 .catalog__products_grid {
   padding-top: 16px;
   display: grid;
@@ -550,4 +659,368 @@
 .catalog__products_card img {
   background-color: #f6f6f6;
   width: 100%;
+}
+
+.register {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 32px;
+}
+.register_form {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 40%;
+  border: #000000 solid 1px;
+  padding: 30px;
+  box-sizing: border-box;
+}
+.register_form h1 {
+  font-size: 24px;
+  border-bottom: #000000 solid 1px;
+  padding-bottom: 16px;
+}
+.register_form label {
+  padding-top: 16px;
+  font-size: 20px;
+  font-weight: 600;
+}
+.register_form input, .register_form select {
+  height: 60px;
+  font-family: "PT Sans", sans-serif;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 20px;
+  border: 1px solid #bfbfbf;
+}
+.register_form input.error, .register_form select.error {
+  box-shadow: inset 2px 4px 6px rgba(235, 37, 37, 0.25);
+  border-color: red;
+}
+.register_form button {
+  margin-top: 16px;
+  height: 60px;
+  background-color: black;
+  border: none;
+  color: white;
+  font-size: 20px;
+  transition: all 0.2s;
+}
+.register_form button:active {
+  scale: 0.95;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 32px;
+}
+.login_form {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 40%;
+  border: #000000 solid 1px;
+  padding: 30px;
+  box-sizing: border-box;
+}
+.login_form h1 {
+  font-size: 24px;
+  border-bottom: #000000 solid 1px;
+  padding-bottom: 16px;
+}
+.login_form label {
+  padding-top: 16px;
+  font-size: 20px;
+  font-weight: 600;
+}
+.login_form input, .login_form select {
+  height: 60px;
+  font-family: "PT Sans", sans-serif;
+  padding: 5px;
+  font-size: 20px;
+  border: 1px solid #bfbfbf;
+}
+.login_form input.error, .login_form select.error {
+  box-shadow: inset 2px 4px 6px rgba(235, 37, 37, 0.25);
+  border-color: red;
+}
+.login_form button {
+  margin-top: 16px;
+  height: 60px;
+  background-color: black;
+  border: none;
+  color: white;
+  font-size: 20px;
+  transition: all 0.2s;
+}
+.login_form button:active {
+  scale: 0.95;
+}
+
+.error_msg {
+  display: none;
+  color: red;
+  font-size: 20px;
+}
+.error_msg_display {
+  display: block;
+}
+
+.product {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 32px;
+}
+.product label {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+}
+.product__top {
+  display: flex;
+  gap: 50px;
+}
+.product__top_left {
+  width: 60%;
+}
+.product__top_right {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.product__top_right h1 {
+  font-size: 36px;
+}
+.product__top_right ul li {
+  font-size: 20px;
+  list-style: symbols(url(./img/general/product/list_style.svg));
+  list-style-position: inside;
+}
+.product__flavour {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.product__flavour select {
+  height: 60px;
+  box-sizing: border-box;
+  padding: 10px;
+  border: #b0b0b0 1px solid;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+.product__flavour select:hover {
+  background-color: #f1f1f1;
+  border: #000 1px solid;
+}
+.product__size {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.product__size div {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.product__size div button {
+  height: 60px;
+  box-sizing: border-box;
+  padding: 10px;
+  border: #b0b0b0 1px solid;
+  font-size: 16px;
+  background-color: #fff;
+  transition: all 0.2s;
+}
+.product__size div button.selected {
+  background-color: black;
+  color: white;
+  border: none;
+}
+.product__size div button.selected:hover {
+  background-color: #000000;
+  border: none;
+}
+.product__size div button.out-of-stock {
+  background-color: rgb(178, 178, 178);
+  border: none;
+}
+.product__size div button.out-of-stock:hover {
+  background-color: rgb(178, 178, 178);
+  border: none;
+}
+.product__size div button:hover {
+  background-color: #f1f1f1;
+  border: 1px solid #000;
+}
+.product__price {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: "Montserrat", sans-serif;
+  display: flex;
+  gap: 10px;
+  align-items: end;
+}
+.product__price .before {
+  font-family: "Montserrat", sans-serif;
+  font-size: 20px;
+  color: #a2a2a2;
+  font-weight: 500;
+  text-decoration: line-through;
+}
+.product__price .after {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 900;
+  color: rgb(187, 1, 1);
+}
+.product__amount {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.product__amount_bottom {
+  display: flex;
+  gap: 10px;
+}
+.product__amount_amount {
+  display: flex;
+}
+.product__amount_amount button {
+  font-size: 48px;
+  height: 60px;
+  width: 60px;
+  background-color: white;
+  border: #b0b0b0 1px solid;
+  font-weight: 300;
+  font-family: "Montserrat", sans-serif;
+}
+.product__amount_amount button.btn--disabled {
+  background-color: rgb(178, 178, 178);
+  border: none;
+}
+.product__amount_amount button.btn--disabled:hover {
+  background-color: rgb(178, 178, 178);
+  border: none;
+}
+.product__amount_amount button:hover {
+  background-color: #f1f1f1;
+  border: 1px solid #000;
+}
+.product__amount_amount input {
+  font-family: "Montserrat", sans-serif;
+  box-sizing: border-box;
+  padding: 10px;
+  border: #b0b0b0 1px solid;
+  width: 80px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+.product__order {
+  font-size: 20px;
+  width: 100%;
+  height: 60px;
+  color: #ffffff;
+  background-color: rgb(0, 0, 0);
+  border: none;
+  font-weight: 700;
+  font-family: "Montserrat", sans-serif;
+}
+.product__order:hover {
+  background-color: #1f1f1f;
+}
+.product__overview {
+  display: flex;
+  flex-direction: column;
+}
+.product__overview section {
+  width: 100%;
+  border-top: #000 solid 1px;
+  border-bottom: #000 solid 1px;
+}
+.product__overview section.open a span {
+  transform: rotate(90deg);
+}
+.product__overview section.open div {
+  opacity: 1;
+  font-size: 16px;
+  height: auto;
+  padding-bottom: 16px;
+}
+.product__overview section a {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  color: #000;
+}
+.product__overview section a span {
+  font-size: 28px;
+  font-weight: 200;
+  font-family: "Montserrat", sans-serif;
+  transform: rotate(-90deg);
+  transition: transform 0.3s ease;
+}
+.product__overview section div {
+  opacity: 0;
+  font-size: 0;
+  height: 0;
+  padding-bottom: 0px;
+  transition: all 0.3s ease;
+}
+
+.admin {
+  padding-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.admin__top {
+  display: flex;
+  gap: 15px;
+}
+.admin button {
+  font-size: 20px;
+  height: 60px;
+  background-color: white;
+  border: #b0b0b0 1px solid;
+  font-weight: 300;
+  font-family: "Montserrat", sans-serif;
+  padding: 10px;
+}
+.admin button:hover {
+  border: 1px solid #000;
+}
+.admin button:active {
+  scale: 0.95;
+}
+.admin__table {
+  padding-top: 20px;
+  width: 100%;
+}
+.admin__table tr {
+  text-align: center;
+}
+.admin__table tr form {
+  padding-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.admin__table tr form label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.admin__table tr form input, .admin__table tr form textarea {
+  padding: 10px;
+  font-size: 16px;
+  border: #b0b0b0 1px solid;
 }/*# sourceMappingURL=style.css.map */
