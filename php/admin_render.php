@@ -4,7 +4,7 @@ require_once './db.php';
 $table = $_GET['table'] ?? '';
 
 // Optional: allow only specific tables if security matters
-$allowedTables = ['products', 'descriptions', 'images', 'users', 'cart', 'favs', 'review'];
+$allowedTables = ['products', 'descriptions', 'images', 'users', 'cart', 'favs', 'review', 'orders'];
 if (!in_array($table, $allowedTables)) {
     echo "<tr><td>Неверный параметр таблицы</td></tr>";
     exit;

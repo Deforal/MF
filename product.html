@@ -23,24 +23,8 @@
             <p><p>
         </nav>
         <section class="product__top">
-            <div class="product__top_left">
-                <div class="product__imges">
-                    <img src="./img/catalog/id-1/0.webp" alt="">
-                </div>
-                <div class="product__overview">
-                    <section>
-                        <a href="">Обзор <span><</span></a>
-                        <div>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, error!</div>
-                    </section>
-                    <section>
-                        <a href="">Преимущества <span><</span></a>
-                        <div>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, error!</div>
-                    </section>
-                    <section>
-                        <a href="">Как принимать <span><</span></a>
-                        <div>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, error!</div>
-                    </section>
-                </div>
+            <div class="product__imges">
+                <img src="./img/catalog/id-1/0.webp" alt="">
             </div>
             <div class="product__top_right">
                 <h1>Lorem ipsum dolor sit amet consectetur.</h1>
@@ -72,11 +56,27 @@
                             <input type="number" id="qty-input" min="1" max="50" value="1">
                             <button id="qty-plus">+</button>
                         </div>
-                        <button class="product__order">В корзину</button>
+                        <button id="cart_product" class="product__order">В корзину</button>
                     </div>
                     <p id="qty-error" class="error-msg" style="display:none; color:red;">Максимум 50</p>
                 </div>
                 
+            </div>
+            <div class="product__top_left">
+                <div class="product__overview">
+                    <section>
+                        <a href="">Обзор <span><</span></a>
+                        <div>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, error!</div>
+                    </section>
+                    <section>
+                        <a href="">Преимущества <span><</span></a>
+                        <div>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, error!</div>
+                    </section>
+                    <section>
+                        <a href="">Как принимать <span><</span></a>
+                        <div>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, error!</div>
+                    </section>
+                </div>
             </div>
         </section>
         <section class="product__bottom"></section>

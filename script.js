@@ -1,81 +1,82 @@
 "use strict";
-function mainSlider() {
-    const slidesContainer = document.querySelector(".Main-slides-container");
-    const slides = document.querySelectorAll(".Main-slide");
-    const dots = document.querySelectorAll(".dot");
-    const prev = document.querySelector(".prev");
-    const next = document.querySelector(".next");
+window.addEventListener("load", () => {
+    // MAIN SLIDER
+    const page = document?.querySelector(".TP");
+    if (!page) return;
+    const mainContainer = document.querySelector(".Main-slides-container");
+    const mainSlides = document.querySelectorAll(".Main-slide");
+    const mainDots = document.querySelectorAll(".dot");
+    const mainPrev = document.querySelector(".prev");
+    const mainNext = document.querySelector(".next");
 
-    let currentIndex = 0;
+    let mainIndex = 0;
 
-    function updateSlider(index) {
-        slidesContainer.style.transform = `translateX(-${index * 100}%)`;
-
-        dots.forEach(dot => dot.classList.remove("active"));
-        dots[index].classList.add("active");
-
-        currentIndex = index;
+    function updateMainSlider() {
+        const width = mainSlides[0].clientWidth;
+        mainContainer.style.transform = `translateX(-${mainIndex * width}px)`;
+        mainDots.forEach(dot => dot.classList.remove("active"));
+        if (mainDots[mainIndex]) mainDots[mainIndex].classList.add("active");
     }
 
-    prev.addEventListener("click", () => {
-        const newIndex = (currentIndex - 1 + slides.length) % slides.length;
-        updateSlider(newIndex);
+    function resizeMainSlider() {
+        updateMainSlider();
+    }
+
+    mainPrev?.addEventListener("click", () => {
+        mainIndex = (mainIndex - 1 + mainSlides.length) % mainSlides.length;
+        updateMainSlider();
     });
 
-    next.addEventListener("click", () => {
-        const newIndex = (currentIndex + 1) % slides.length;
-        updateSlider(newIndex);
+    mainNext?.addEventListener("click", () => {
+        mainIndex = (mainIndex + 1) % mainSlides.length;
+        updateMainSlider();
     });
 
-    dots.forEach((dot, index) => {
+    mainDots.forEach((dot, idx) => {
         dot.addEventListener("click", () => {
-            updateSlider(index);
+            mainIndex = idx;
+            updateMainSlider();
         });
     });
 
-    updateSlider(currentIndex);
-}
-function TP_slider() {
-    const carousel = document.querySelector(".TP-img-track")
-    const imges = carousel.querySelectorAll("img")
-    const button = document.querySelector(".TP-right").querySelector("button")
-    carousel.style.width = `${imges.length * 728}px`;
-    let index = 0
-    function changeSlides() {
-        const slashes = document.querySelector(".TP-slash").querySelectorAll("button");
-        const text = document.querySelectorAll(".TP-text");
-        index++;
-        if (index === imges.length) {
-            index = 0;
-        }
-        carousel.style.transform = `translateX(-${index * 728}px)`;
-        text.forEach(element => {
-            element.classList.remove("active")
-        })
-        text[index].classList.add("active")
-        slashes.forEach(element => {
-            element.classList.remove("active")
-        })
-        slashes[index].classList.add("active")
-        console.log(text);
-        console.log(slashes);
+    window.addEventListener("resize", resizeMainSlider);
+    updateMainSlider();
+
+    // TP SLIDER
+    const tpTrack = document.querySelector(".TP-img-track");
+    const tpSlides = tpTrack?.querySelectorAll("div");
+    const tpNext = document.querySelector(".TP-right button");
+    const tpDots = document.querySelectorAll(".TP-slash button");
+    const tpTexts = document.querySelectorAll(".TP-text");
+
+    let tpIndex = 0;
+
+    function updateTPSlider() {
+        const slideWidth = document.querySelector(".TP-img").clientWidth;
+        tpTrack.style.transform = `translateX(-${tpIndex * slideWidth}px)`;
+
+        tpDots.forEach(dot => dot.classList.remove("active"));
+        if (tpDots[tpIndex]) tpDots[tpIndex].classList.add("active");
+
+        tpTexts.forEach(text => text.classList.remove("active"));
+        if (tpTexts[tpIndex]) tpTexts[tpIndex].classList.add("active");
     }
-    button.addEventListener("click", changeSlides)
-    const slashes = document.querySelector(".TP-slash").querySelectorAll("button");
-    let count = 0
-    slashes.forEach(element => {
-        element.dataset.count = count;
-        count++;
-        element.addEventListener("click", () => {
-            index = element.dataset.count - 1;
-            changeSlides();
-        })
+
+    tpNext?.addEventListener("click", () => {
+        tpIndex = (tpIndex + 1) % tpSlides.length;
+        updateTPSlider();
     });
-    console.log(imges);
-    console.log(button);
-}
-document?.querySelector(".Main-slider")?.addEventListener("load", mainSlider())
-document?.querySelector(".TP")?.addEventListener("load", TP_slider())
+
+    tpDots.forEach((dot, idx) => {
+        dot.addEventListener("click", () => {
+            tpIndex = idx;
+            updateTPSlider();
+        });
+    });
+
+    window.addEventListener("resize", updateTPSlider);
+    updateTPSlider();
+});
 async function isUserLoggedIn() {
     try {
         const res = await fetch('./php/is_logged_in.php');
@@ -89,12 +90,14 @@ async function header() {
     const header = document?.querySelector(".header_landing");
     if (!header) return console.error("header is absent");
 
-    const [filtersRes, isLoggedIn] = await Promise.all([
+    const [filtersRes, isLoggedIn, cartAmountRes] = await Promise.all([
         fetch("./php/get_header_filters.php").then(res => res.json()),
-        isUserLoggedIn()
+        isUserLoggedIn(),
+        fetch("./php/get_cart_amount.php").then(res => res.json())
     ]);
 
     const data = filtersRes;
+    const cartAmount = cartAmountRes.amount;
 
     const buildDropdown = (label, name, values) => {
         return `
@@ -102,9 +105,8 @@ async function header() {
                 <button href="#" class="dropdown_btn">${label}</button>
                 <div class="dropdown_content">
                     ${values.map(val => {
-                        console.log(val);
                         const encoded = encodeURIComponent(val);
-                        return `<a href="./catalog.html?${label}=${encoded}">${val}</a>`;
+                        return `<a href="./catalog.html?${name}=${encoded}">${val}</a>`;
                     }).join('')}
                 </div>
             </div>`;
@@ -116,8 +118,8 @@ async function header() {
             <img src="./img/logos/Profile.svg" alt="" class="profile_icon link_like">
             <div class="profile_dropdown hidden">
                 ${isLoggedIn.user.Role == 1 ? `<a href ="./admin_panel.html" class="link_like"> Админ панель </a>` : ``}
-                <p class="link_like">Профиль</p>
-                <p class="link_like">История заказов</p>
+                <a href="./profile.html" class="link_like">Профиль</a>
+                <a class="link_like" href="./history.html">История заказов</p>
                 <a class="link_like" href="./php/logout.php">Выйти</a>
             </div>
         </div>`
@@ -139,16 +141,17 @@ async function header() {
                     ${profileHTML}
                     <div class="header_top_right_cart">
                         <a href="./cart.html"><img src="./img/logos/Cart.svg" alt="" class="cart_icon"></a>
-                        <p class="header_top_right_cart_p ${isLoggedIn ? "display" : ""}">3</p>
+                        <p class="header_top_right_cart_p ${cartAmount > 0 ? "display" : ""}">${cartAmount}</p>
                     </div>
                 </div>
             </section>
             <nav class="header_bottom center">
+                <a href="./catalog.html">Каталог</a>
                 ${buildDropdown('Тип', 'type', data.type)}
                 ${buildDropdown('Категория', 'category', data.category)}
                 <a href="./catalog.html?sale=1">Скидки</a>
                 ${buildDropdown('Размер', 'size', data.size)}
-                ${buildDropdown('Вкус', 'size', data.flavour)}
+                ${buildDropdown('Вкус', 'flavour', data.flavour)}
             </nav>
         </div>
     `;
@@ -194,8 +197,8 @@ function footer() {
             </div>
             <div class="footer__help">
                 <h3>Нужна помощь?</h3>
-                <p>011 - 49594959</p>
-                <p>indiacustomercare@glanbia.com</p>
+                <p>+7-989-888-88-88</p>
+                <p>MFCompany@gmail.com</p>
             </div>
             <div class="footer__SM">
                 <h3>Наши соц. сети</h3>
@@ -222,13 +225,23 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener('DOMContentLoaded', () => {
     const page = document.querySelector(".catalog");
     if (!page) return;
+
+    const labelToFieldMap = {
+        'Вкус': 'Flavour',
+        'Вес': 'Size',
+        'Категория': 'Category',
+        'Тип': 'Type'
+    };
+    const fieldToLabelMap = Object.fromEntries(
+        Object.entries(labelToFieldMap).map(([k, v]) => [v, k])
+    );
+
     // Load filters and render them
     fetch('./php/get_filters.php')
         .then(response => response.json())
         .then(data => {
             const filtersContainer = document.getElementById('filters');
             filtersContainer.innerHTML = '';
-            console.log(data);
             for (const [filterName, options] of Object.entries(data)) {
                 const fieldset = document.createElement('fieldset');
                 const legend = document.createElement('legend');
@@ -249,13 +262,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 filtersContainer.appendChild(fieldset);
             }
-            const urlParams = new URLSearchParams(window.location.search);
+
             // Set filters and sort based on URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
             urlParams.forEach((value, key) => {
-                console.log(value, key);
-                const radio = document.querySelector(`#filters input[name="${key}"][value="${value}"]`);
-                if (radio) {
-                    radio.checked = true;
+                const label = fieldToLabelMap[key];
+                if (label) {
+                    const radio = document.querySelector(`#filters input[name="${label}"][value="${value}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                    }
                 }
             });
 
@@ -268,25 +284,35 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add event listeners to all radios to trigger filtering on change
             filtersContainer.querySelectorAll('input[type=radio]').forEach(radio => {
                 radio.addEventListener('change', () => {
-                    const filters = gatherFilters();
+                    const filters = gatherFilters(labelToFieldMap);
                     fetchFilteredProducts(filters);
                 });
             });
 
             // Initial fetch of products with current filters
-            const filters = gatherFilters();
+            const filters = gatherFilters(labelToFieldMap);
             fetchFilteredProducts(filters);
+
+            // Menu collapse button
+            const menu_btn = document.getElementById("collapse_menu")
+            menu_btn.addEventListener("click", () => {
+                const menu = document.querySelector(".catalog__side_menu")
+                const grid = document.querySelector(".catalog__products_grid")
+                menu.classList.toggle("close")
+                grid.classList.toggle("more")
+            });
         })
         .catch(error => console.error('Error fetching filters:', error));
 });
 
-function gatherFilters() {
+// Modified to accept label-field map
+function gatherFilters(labelToFieldMap) {
     const filters = {};
     document.querySelectorAll('#filters fieldset').forEach(fieldset => {
-        const key = fieldset.querySelector('legend').textContent;
+        const label = fieldset.querySelector('legend').textContent;
         const selected = fieldset.querySelector('input[type="radio"]:checked');
-        if (selected) {
-            filters[key] = selected.value;
+        if (selected && labelToFieldMap[label]) {
+            filters[labelToFieldMap[label]] = selected.value;
         }
     });
     return filters;
@@ -307,8 +333,44 @@ function fetchFilteredProducts(filters) {
             const grid = document.querySelector('.catalog__products_grid');
             const amountElem = document.querySelector('.amount_products');
 
-            grid.innerHTML = '';
+            // --- 🔽 Apply sorting manually here ---
+            if (sortValue === 'price-asc') {
+                products.sort((a, b) => {
+                    const priceA = a.Second_price ? parseFloat(a.Second_price) : parseFloat(a.Price);
+                    const priceB = b.Second_price ? parseFloat(b.Second_price) : parseFloat(b.Price);
+                    return priceA - priceB;
+                });
+            } else if (sortValue === 'price-desc') {
+                products.sort((a, b) => {
+                    const priceA = a.Second_price ? parseFloat(a.Second_price) : parseFloat(a.Price);
+                    const priceB = b.Second_price ? parseFloat(b.Second_price) : parseFloat(b.Price);
+                    return priceB - priceA;
+                });
+            } else if (sortValue === 'sales') {
+                products.sort((a, b) => {
+                    const soldA = parseInt(a.Amount_sold || 0);
+                    const soldB = parseInt(b.Amount_sold || 0);
+                    return soldB - soldA;
+                });
+            } else if (sortValue === 'sale') {
+                // Put discounted products first
+                products.sort((a, b) => {
+                    const aHasSale = a.Second_price !== null && a.Second_price !== '';
+                    const bHasSale = b.Second_price !== null && b.Second_price !== '';
 
+                    // First, compare whether they are on sale
+                    if (aHasSale && !bHasSale) return -1;
+                    if (!aHasSale && bHasSale) return 1;
+
+                    // Optional: within each group, sort by effective price
+                    const priceA = aHasSale ? parseFloat(a.Second_price) : parseFloat(a.Price);
+                    const priceB = bHasSale ? parseFloat(b.Second_price) : parseFloat(b.Price);
+                    return priceA - priceB;
+                });
+            }
+            // --- 🔼 Done sorting ---
+
+            grid.innerHTML = '';
             amountElem.textContent = `Найдено товаров: ${products.length}`;
 
             if (products.length === 0) {
@@ -324,8 +386,12 @@ function fetchFilteredProducts(filters) {
                         <img src="./img/catalog/id-${product.id}/${product.image}" alt="">
                     </a>
                     <h4>${product.NewName} - ${product.Flavour} - ${product.Size}</h4>
-                    <div>${product.Rating ?? 0} ★ (${product.ReviewCount} отзывов)</div>
-                    <p>${product.Price}₽</p>
+                    
+                    ${
+                        product.Second_price
+                            ? `<p class="new_price">${product.Second_price}₽</p> <p class="old_price">${product.Price}₽</p>`
+                            : `<p class="normal_price">${product.Price}₽</p>`
+                    }
                 `;
                 grid.appendChild(card);
             });
@@ -333,17 +399,28 @@ function fetchFilteredProducts(filters) {
         .catch(error => console.error('Ошибка загрузки товаров:', error));
 }
 
-// Also listen for sort select changes
+// Sort dropdown change
 document?.getElementById('sort-select')?.addEventListener('change', () => {
-    const filters = gatherFilters();
+    const filters = gatherFilters({
+        'Вкус': 'Flavour',
+        'Вес': 'Size',
+        'Категория': 'Category',
+        'Тип': 'Type'
+    });
     fetchFilteredProducts(filters);
 });
+
+// Clear filters button
 document?.getElementById('clear-filters')?.addEventListener('click', () => {
     document.querySelectorAll('#filters input[type="radio"]').forEach(radio => {
         radio.checked = false;
     });
-
-    const filters = gatherFilters();
+    const filters = gatherFilters({
+        'Вкус': 'Flavour',
+        'Вес': 'Size',
+        'Категория': 'Category',
+        'Тип': 'Type'
+    });
     fetchFilteredProducts(filters);
 });
 
@@ -682,6 +759,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     updateQtyControls(); // initial
+
+    document.getElementById("cart_product").addEventListener("click", async () => {
+        const qty = parseInt(qtyInput.value) || 1;
+
+        // Get selected size button (that has the data-pid)
+        const selectedSizeBtn = sizeButtonsContainer.querySelector(".selected");
+        if (!selectedSizeBtn) {
+            alert("Пожалуйста, выберите вес товара.");
+            return;
+        }
+
+        const productId = selectedSizeBtn.dataset.Pid;
+
+        const formData = new FormData();
+        formData.append("Product_id", productId);
+        formData.append("Amount", qty);
+
+        try {
+            const response = await fetch("./php/addToCart.php", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                header()
+            } else {
+                alert("Ошибка: " + result.message);
+            }
+        } catch (error) {
+            console.error("Ошибка при добавлении в корзину:", error);
+            alert("Произошла ошибка при добавлении в корзину.");
+        }
+    });
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -691,12 +803,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const renderTable = async (tableName) => {
         const table = document.getElementById(tableName);
         try {
-        const response = await fetch(`./php/admin_render.php?table=${tableName}`);
-        const html = await response.text();
-        table.innerHTML = html;
+            const response = await fetch(`./php/admin_render.php?table=${tableName}`);
+            const html = await response.text();
+            table.innerHTML = html;
         } catch (error) {
-        console.error(`Error loading ${tableName}:`, error);
-        table.innerHTML = `<tr><td colspan="100%" class="error">Failed to load ${tableName} table.</td></tr>`;
+            console.error(`Error loading ${tableName}:`, error);
+            table.innerHTML = `<tr><td colspan="100%" class="error">Failed to load ${tableName} table.</td></tr>`;
         }
     };
 
@@ -778,4 +890,284 @@ document.addEventListener("submit", async (e) => {
         console.error('Ошибка при добавлении:', err);
     }
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const page = document.getElementById("profile")
+    if (!page) return;
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const container = button.parentElement;
+            const valueSpan = container.querySelector('.value');
+            const originalValue = valueSpan.textContent;
+            const field = valueSpan.dataset.field;
 
+            const input = document.createElement('input');
+            input.type = field === 'Birth' ? 'date' : 'text';
+            input.value = originalValue;
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.classList.add("edit-btn")
+            confirmBtn.textContent = '✔';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.classList.add("edit-btn")
+            cancelBtn.textContent = '✖';
+
+            valueSpan.style.display = 'none';
+            button.style.display = 'none';
+
+            container.appendChild(input);
+            container.appendChild(confirmBtn);
+            container.appendChild(cancelBtn);
+
+            cancelBtn.addEventListener('click', () => {
+            input.remove();
+            confirmBtn.remove();
+            cancelBtn.remove();
+            valueSpan.style.display = '';
+            button.style.display = '';
+            });
+
+            confirmBtn.addEventListener('click', () => {
+            fetch('./php/update_profile.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ field: field, value: input.value })
+            })
+            .then(res => res.text())
+            .then(msg => {
+                valueSpan.textContent = input.value;
+                cancelBtn.click(); // trigger cancel to cleanup
+            });
+            });
+        });
+        });
+    fetch('./php/is_logged_in.php')
+        .then(res => res.json())
+        .then(data => {
+            if (!data.loggedIn) {
+                alert('Ошибка загрузки профиля');
+                return;
+            }
+
+            const user = data.user;
+
+            // Map field keys to element IDs
+            const fieldMap = {
+                Name: 'profile-name',
+                Email: 'profile-email',
+                Phone: 'profile-phone',
+                Birth: 'profile-birth',
+                Gender: 'profile-gender'
+            };
+
+            for (const field in fieldMap) {
+                const el = document.getElementById(fieldMap[field]);
+                if (el) el.textContent = user[field] || 'Не указано';
+            }
+        })
+        .catch(err => {
+            console.error('Ошибка:', err);
+        });
+})
+document.addEventListener("DOMContentLoaded", async () => {
+    const container = document.getElementById("cart-container");
+    const summarySection = document.querySelector(".cart__right");
+    if (!container || !summarySection) return;
+
+    const authRes = await fetch("./php/is_logged_in.php");
+    const authData = await authRes.json();
+
+    if (!authData.loggedIn) {
+        container.innerHTML = `<p style="color: red;">Пожалуйста, войдите в аккаунт, чтобы увидеть корзину.</p>`;
+        return;
+    }
+
+    const fetchCart = async () => {
+        const res = await fetch("./php/getCart.php");
+        return await res.json();
+    };
+
+    const updateCartItem = async (productId, amount) => {
+        await fetch('./php/updateCartItem.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, amount })
+        });
+    };
+
+    const deleteCartItem = async (productId) => {
+        await fetch('./php/deleteCartItem.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId })
+        });
+    };
+
+    const renderCart = async () => {
+        header()
+        const cartData = await fetchCart();
+        container.innerHTML = '';
+        if (cartData.error) {
+            container.innerHTML = `<p style="color: red;">${cartData.error}</p>`;
+            return;
+        }
+
+        const items = cartData.cart;
+        if (items.length === 0) {
+            container.innerHTML = `<p>Корзина пуста.</p>`;
+            summarySection.innerHTML = '';
+            return;
+        }
+
+        const list = document.createElement("div");
+        list.classList.add("cart__list");
+
+        let totalItems = 0;
+        let subtotal = 0;
+
+        items.forEach(item => {
+            const product = document.createElement("div");
+            product.classList.add("cart__item");
+
+            const price = item.Second_price !== null ? parseFloat(item.Second_price) : parseFloat(item.Price);
+            const itemTotal = price * item.Amount;
+
+            totalItems += item.Amount;
+            subtotal += itemTotal;
+
+            product.innerHTML = `
+                <a href="./product.html?id=${item.id}"><img src="./img/catalog/id-${item.id}/${item.URL}" alt="${item.FullName}" class="cart__img"></a>
+                <div class="cart__info">
+                    <div class="cart__info_left">
+                        <h3>${item.FullName}</h3>
+                        <p><b>Вкус:</b> ${item.Flavour}</p>
+                        <p><b>Вес:</b> ${item.Size}</p>
+                    </div>  
+                    <div class="cart__info_right"> 
+                        <p><b>Цена:</b> ${price} ₽</p>
+                        <div class="product__amount_amount">
+                            <div>
+                                <button class="qty-minus" data-id="${item.id}">-</button>
+                                <input type="number" class="qty-input" min="1" max="50" value="${item.Amount}" data-id="${item.id}">
+                                <button class="qty-plus" data-id="${item.id}">+</button>
+                            </div>
+                            <button class="remove-btn" data-id="${item.id}">Удалить</button>
+                        </div>
+                    </div>
+                    
+                </div>
+            `;
+
+            list.appendChild(product);
+        });
+
+        container.appendChild(list);
+
+        summarySection.innerHTML = `
+            <h2>Обзор</h2>
+            <p id="summary-items">${totalItems} товара(-ов)</p>
+            <p>Подитог: <span id="summary-subtotal">${subtotal.toFixed(2)} ₽</span></p>
+            <p>Налог: рассчитывается при оформлении</p>
+            <p>Доставка: Бесплатно</p>
+            <hr>
+            <p><strong>Итого: <span id="summary-total">${subtotal.toFixed(2)} ₽</span></strong></p>
+            <button id="checkout-btn">Оформить заказ</button>
+        `;
+        const checkoutBtn = document.getElementById("checkout-btn");
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener("click", async () => {
+                console.log(checkoutBtn);
+                const confirmOrder = confirm("Подтвердить заказ?");
+                if (!confirmOrder) return;
+
+                const res = await fetch("./php/checkout.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert("Заказ успешно оформлен!");
+                    renderCart(); // Refresh cart after order
+                } else {
+                    alert("Ошибка при оформлении заказа: " + data.error);
+                }
+            });
+        }
+        document.querySelectorAll(".qty-plus").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const input = btn.previousElementSibling;
+                const newVal = parseInt(input.value) + 1;
+                await updateCartItem(btn.dataset.id, newVal);
+                renderCart();
+            });
+        });
+
+        document.querySelectorAll(".qty-minus").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const input = btn.nextElementSibling;
+                const newVal = Math.max(1, parseInt(input.value) - 1);
+                await updateCartItem(btn.dataset.id, newVal);
+                renderCart();
+            });
+        });
+
+        document.querySelectorAll(".remove-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                await deleteCartItem(btn.dataset.id);
+                renderCart();
+            });
+        });
+
+        document.querySelectorAll(".qty-input").forEach(input => {
+            input.addEventListener("change", async () => {
+                const newVal = Math.max(1, parseInt(input.value));
+                await updateCartItem(input.dataset.id, newVal);
+                renderCart();
+            });
+        });
+    };
+
+    renderCart();
+
+});
+
+function fetchOrderHistory() {
+    fetch('./php/get_order_history.php')
+        .then(res => res.json())
+        .then(orders => {
+            const grid = document.querySelector('.history__grid');
+            grid.innerHTML = '';
+
+            if (!orders.length) {
+                grid.innerHTML = '<p>У вас ещё нет заказов.</p>';
+                return;
+            }
+
+            orders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = 'catalog__products_card'; // reuse styling
+                const orderDate = new Date(order.Date).toLocaleDateString('ru-RU');
+                console.log(order);
+                card.innerHTML = `
+                    <a href="product.html?id=${order.Product_id}">
+                        <img src="./img/catalog/id-${order.Product_id}/${order.image}" alt="">
+                    </a>
+                    <h4>${order.NewName} - ${order.Flavour} - ${order.Size}</h4>
+                    <p><b>Количество:</b> ${order.Amount}</p>
+                    <p><b>Дата заказа:</b> ${orderDate}</p>
+                `;
+                grid.appendChild(card);
+            });
+        })
+        .catch(err => {
+            console.error('Ошибка при загрузке истории заказов:', err);
+        });
+}
+
+// Call when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.querySelector('.history__grid')) {
+        fetchOrderHistory();
+    }
+});

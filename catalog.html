@@ -21,6 +21,7 @@
             <p>Каталог<p>
         </nav>
         <section class="catalog__products">
+            <div id="collapse_menu">☰</div>
             <div class="catalog__side_menu">
                 <h1>Сортировать по:</h1>
                 <div id="filters"></div>
@@ -33,14 +34,12 @@
                         <p class="amount_products">Amount</p>  
                     </div>
                     <div>
-                        <label for="sort-select">Сортировка:</label>
                         <select id="sort-select">
-                            <option value="">Без сортировки</option>
-                            <option value="for_sale">Товары со скидками</option>
-                            <option value="price_asc">Цена: по возрастанию</option>
-                            <option value="price_desc">Цена: по убыванию</option>
-                            <option value="sales_desc">Популярность: сначала самые продаваемые</option>
-                            <option value="sales_asc">Популярность: сначала наименее продаваемые</option>
+                            <option value="">Выберите метод сортировки</option>
+                            <option value="price-asc">Сначала дешёвые</option>
+                            <option value="price-desc">Сначала дорогие</option>
+                            <option value="sales">Популярные</option>
+                            <option value="sale">Со скидкой</option>
                         </select>
                     </div>
                 </div>
