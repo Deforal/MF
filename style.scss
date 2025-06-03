@@ -268,6 +268,7 @@ select {
   }
 }
 .TP {
+    margin-top: 32px;
     display: flex;
     width: 100%;
     flex-wrap: wrap;
@@ -834,6 +835,9 @@ select {
     display: flex;
     flex-direction: column;
     padding-bottom: 32px;
+    & #product__rating {
+        font-size: 24px;
+    }
     &__imges {
         width: 100%;
         display: flex;
@@ -860,7 +864,7 @@ select {
                 font-size: 36px;
             }
             & ul li {
-                font-size: 20px;
+                font-size: 16px;
                 list-style:symbols(url(./img/general/product/list_style.svg));
                 list-style-position: inside;
             }
@@ -1019,6 +1023,9 @@ select {
                     font-size: 16px; // Or your default
                     height: auto;
                     padding-bottom: 16px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
                 }
             }
 
@@ -1047,6 +1054,93 @@ select {
                 transition: all 0.3s ease;
 
                 // display: block; optional, if needed
+            }
+        }
+    }
+    &__bottom {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        & h1 {
+            font-size: 32px;
+            font-weight: 800;
+        }
+        &_reviews {
+            padding-top: 32px;
+            display: flex;
+            flex-direction: column; 
+            gap: 24px;
+            & form {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                & h3 {
+                    font-size: 32px;
+                }
+                & input {
+                    width: 30%;
+                    padding: 10px;
+                    font-family: 'Montserrat', sans-serif;
+                    font-size: 20px;
+                }
+                & select {
+                    border: #040404 1px solid;
+                    width: 10%;
+                    padding: 10px;
+                    text-align: center;
+                    font-weight: 600;
+                }
+                & textarea {
+                    padding: 10px;
+                    font-size: 16px;
+                }
+                & button {
+                    height: 60px;
+                    background-color: black;
+                    border: none;
+                    color: white;
+                    font-size: 24px;
+                    transition: all 0.2s;
+                }
+            }
+        }
+        & .review {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+            &_left {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                & h4 {
+                    font-size: 32px;
+                    font-weight: 600;
+                }
+                & p {
+                    font-size: 24px;
+                    font-weight: 400;
+                    & strong {
+                        font-weight: 500;
+                    }
+                }
+            }
+            &_right {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding-left: 10px;
+                & h3 {
+                    font-size: 24px;
+                }
+                & p {
+                    font-size: 20px;
+                    line-break: anywhere;
+                }
+            }
+            &_rate {
+                font-size: 24px;
+                font-weight: 500;
+                font-family: 'Russo One', sans-serif;
             }
         }
     }
@@ -1083,9 +1177,14 @@ select {
         width: 100%;
         & tr {
             text-align: center;
-            [data-column="Pass"], [data-column="Name"], [data-column="List"], [data-column="Overview"], [data-column="Suggest"], [data-column="Benefits"] {
+            & td {
                 line-break: anywhere;
+            }
+            [data-column="Pass"], [data-column="Name"], [data-column="List"], [data-column="Overview"], [data-column="Suggest"], [data-column="Benefits"] {
                 font-size: 12px;
+            }
+            & button {
+                font-size: 14px;
             }
             & form {
                 padding-top: 10px;
@@ -1435,6 +1534,11 @@ select {
     .history {
         &__grid {
             grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+    .admin {
+        & button {
+            font-size: 16px;
         }
     }
 }

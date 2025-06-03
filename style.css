@@ -276,6 +276,7 @@ select {
 }
 
 .TP {
+  margin-top: 32px;
   display: flex;
   width: 100%;
   flex-wrap: wrap;
@@ -847,6 +848,9 @@ select {
   flex-direction: column;
   padding-bottom: 32px;
 }
+.product #product__rating {
+  font-size: 24px;
+}
 .product__imges {
   width: 100%;
   display: flex;
@@ -875,7 +879,7 @@ select {
   font-size: 36px;
 }
 .product__top_right ul li {
-  font-size: 20px;
+  font-size: 16px;
   list-style: symbols(url(./img/general/product/list_style.svg));
   list-style-position: inside;
 }
@@ -1030,6 +1034,9 @@ select {
   font-size: 16px;
   height: auto;
   padding-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .product__overview section a {
   padding-top: 15px;
@@ -1053,6 +1060,93 @@ select {
   height: 0;
   padding-bottom: 0px;
   transition: all 0.3s ease;
+}
+.product__bottom {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.product__bottom h1 {
+  font-size: 32px;
+  font-weight: 800;
+}
+.product__bottom_reviews {
+  padding-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.product__bottom_reviews form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.product__bottom_reviews form h3 {
+  font-size: 32px;
+}
+.product__bottom_reviews form input {
+  width: 30%;
+  padding: 10px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 20px;
+}
+.product__bottom_reviews form select {
+  border: #040404 1px solid;
+  width: 10%;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+.product__bottom_reviews form textarea {
+  padding: 10px;
+  font-size: 16px;
+}
+.product__bottom_reviews form button {
+  height: 60px;
+  background-color: black;
+  border: none;
+  color: white;
+  font-size: 24px;
+  transition: all 0.2s;
+}
+.product__bottom .review {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 20px;
+}
+.product__bottom .review_left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.product__bottom .review_left h4 {
+  font-size: 32px;
+  font-weight: 600;
+}
+.product__bottom .review_left p {
+  font-size: 24px;
+  font-weight: 400;
+}
+.product__bottom .review_left p strong {
+  font-weight: 500;
+}
+.product__bottom .review_right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 10px;
+}
+.product__bottom .review_right h3 {
+  font-size: 24px;
+}
+.product__bottom .review_right p {
+  font-size: 20px;
+  line-break: anywhere;
+}
+.product__bottom .review_rate {
+  font-size: 24px;
+  font-weight: 500;
+  font-family: "Russo One", sans-serif;
 }
 
 .admin {
@@ -1090,9 +1184,14 @@ select {
 .admin__table tr {
   text-align: center;
 }
-.admin__table tr [data-column=Pass], .admin__table tr [data-column=Name], .admin__table tr [data-column=List], .admin__table tr [data-column=Overview], .admin__table tr [data-column=Suggest], .admin__table tr [data-column=Benefits] {
+.admin__table tr td {
   line-break: anywhere;
+}
+.admin__table tr [data-column=Pass], .admin__table tr [data-column=Name], .admin__table tr [data-column=List], .admin__table tr [data-column=Overview], .admin__table tr [data-column=Suggest], .admin__table tr [data-column=Benefits] {
   font-size: 12px;
+}
+.admin__table tr button {
+  font-size: 14px;
 }
 .admin__table tr form {
   padding-top: 10px;
@@ -1406,6 +1505,9 @@ select {
   }
   .history__grid {
     grid-template-columns: 1fr 1fr 1fr;
+  }
+  .admin button {
+    font-size: 16px;
   }
 }
 @media (max-width: 800px) {

@@ -81,7 +81,12 @@ async function isUserLoggedIn() {
     try {
         const res = await fetch('./php/is_logged_in.php');
         const result = await res.json();
-        return result;
+        if (result.isLoggedIn) {
+            return result;
+        } else {
+            return false;
+        }
+        
     } catch (err) {
         return console.error('Error checking login status:', err);;
     }
@@ -111,7 +116,6 @@ async function header() {
                 </div>
             </div>`;
     };
-    console.log(isLoggedIn);
     const profileHTML = isLoggedIn.loggedIn
         ? `
         <div class="profile_icon_wrapper">
@@ -386,7 +390,7 @@ function fetchFilteredProducts(filters) {
                         <img src="./img/catalog/id-${product.id}/${product.image}" alt="">
                     </a>
                     <h4>${product.NewName} - ${product.Flavour} - ${product.Size}</h4>
-                    
+                    <div>${product.Rating ?? 0} ★ (${product.ReviewCount} отзывов)</div>
                     ${
                         product.Second_price
                             ? `<p class="new_price">${product.Second_price}₽</p> <p class="old_price">${product.Price}₽</p>`
@@ -577,9 +581,10 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadProduct(productId) {
     const res = await fetch(`./php/getVariants.php?id=${productId}`);
     const data = await res.json();
-
+    console.log(data);
     const variants = data.variants;
     const desc = data.description;
+    console.log(data);
     let current = variants[0]; // pick default (or find based on current flavour/size)
 
     // Set product name
@@ -597,12 +602,11 @@ async function loadProduct(productId) {
             <a href="#" class="toggle-overview" data-index="${i}">
                 ${section.title} <span><</span>
             </a>
-            <div class="overview-content">${section.content}</div>
+            <div class="overview-content">${section.content.replaceAll("###", "<br><br>")}</div>
         </section>
     `).join("");
 
     document.querySelector(".product__overview").innerHTML = overviewHTML;
-
     // Toggle overview section visibility
     document.querySelectorAll(".toggle-overview").forEach(link => {
         link.addEventListener("click", e => {
@@ -611,16 +615,16 @@ async function loadProduct(productId) {
             section.classList.toggle("open");
         });
     });
-
+    
     // Benefits (as list items)
-    const benefitList = desc.benefits.split("\n").map(line => `<li>${line}</li>`).join("");
+    const benefitList = desc.list.split("###").map(line => `<li>${line}</li>`).join("");
     document.querySelector(".product_listBenef").innerHTML = benefitList;
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
     const page = document.querySelector(".product");
     if (!page) return;
-
+    let productIDNew = 0;
     const productId = new URLSearchParams(window.location.search).get("id");
 
     if (productId) {
@@ -654,14 +658,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 3. Populate unique flavours from existing variants
     const uniqueFlavours = [...new Set(productVariants.variants.map(p => p.Flavour))];
-    console.log(uniqueFlavours);
     uniqueFlavours.forEach(flavour => {
         const opt = document.createElement("option");
         opt.value = flavour;
         opt.textContent = flavour;
         flavourSelect.appendChild(opt);
     });
-    console.log(selectedProduct);
     // 4. Set selected flavour on page load
     flavourSelect.value = selectedProduct.Flavour;
     showSizesForFlavour(selectedProduct.Flavour, selectedProduct.Size);
@@ -684,7 +686,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             btn.textContent = `${p.Size} (${p.Amount_avbl} шт)` + (isOutOfStock ? " — нет в наличии" : "");
             btn.dataset.price = p.Price;
             btn.dataset.second_price = p.Second_price;
-            btn.dataset.Pid = p.id;
+            btn.dataset.id = p.id;
 
             if (isOutOfStock) {
                 btn.disabled = true;
@@ -693,10 +695,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 btn.addEventListener("click", () => {
                     updatePrice(p.Price, p.Second_price);
                     highlightSelectedSize(btn);
+                    productIDNew = btn.dataset.id
+                    renderReviewsSection();
+                    document.getElementById("product__rating").innerHTML = p.Rating ? `<div> ${p.Rating} ★ (${p.ReviewCount} отзывов)</div>` : "У этого товара нет оценок"
                 });
                 if (p.Size === preselectSize) {
-                    console.log("click");
-                     setTimeout(() => btn.click(), 0);
+                    setTimeout(() => btn.click(), 0);
                 }
             }
 
@@ -794,6 +798,83 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Произошла ошибка при добавлении в корзину.");
         }
     });
+
+    async function fetchReviews() {
+        const res = await fetch(`./php/get_reviews.php?product_id=${productIDNew}`);
+        const reviews = await res.json();
+        return reviews;
+    }
+
+    function renderReview(review) {
+        const productName = `${review.GroupName} ${review.Flavour} ${review.Size}`;
+        return `
+            <div class="review">
+                <div class="review_left">
+                    <h4>${review.UserName}</h4>
+                    <p><strong>Продукт:</strong> ${productName}</p>
+                </div>
+                <div class="review_right">
+                    <h3>${review.Title}</h3>
+                    <p class="review_rate">Оценка: ${review.Rating}/5</p>
+                    <p>${review.Text}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    function getReviewForm() {
+        return `
+            <form id="review-form">
+                <h3>Напишите ваш отзыв</h3>
+                <input type="text" name="title" placeholder="Заголовок отзыва" required />
+                <select name="rating" required>
+                    <option value="">Оцените</option>
+                    ${[1,2,3,4,5].map(n => `<option value="${n}">${n}</option>`).join('')}
+                </select>
+                <textarea name="text" placeholder="Напишите свой отзыв" required></textarea>
+                <button type="submit">Оставить отзыв</button>
+            </form>
+        `;
+    }
+
+    async function renderReviewsSection() {
+        const container = document.getElementById('reviews-container');
+        const reviews = await fetchReviews();
+        const isLoggedIn = await isUserLoggedIn();
+
+        container.innerHTML = `
+            ${isLoggedIn ? getReviewForm() : ''}
+            <h1>Отзывы других пользователей</h1>
+            ${reviews.map(renderReview).join('')}
+        `;
+
+        if (isLoggedIn) {
+            const form = document.getElementById('review-form');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const data = {
+                    product_id: productId,
+                    title: formData.get('title'),
+                    text: formData.get('text'),
+                    rating: formData.get('rating')
+                };
+
+                const res = await fetch('./php/submit_review.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    renderReviewsSection(); // Refresh the reviews
+                } else {
+                    alert('Error submitting review');
+                }
+            });
+        }
+    }
+
 });
 
 document.addEventListener("DOMContentLoaded", () => {
