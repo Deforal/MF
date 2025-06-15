@@ -77,11 +77,34 @@ window.addEventListener("load", () => {
     window.addEventListener("resize", updateTPSlider);
     updateTPSlider();
 });
+
+let loaderTimeout;
+
+function showLoaderDelayed() {
+    clearTimeout(loaderTimeout); // clear previous in case of spam clicking
+    loaderTimeout = setTimeout(() => {
+        document.getElementById('loader').style.display = 'flex';
+    }, 200); // Show loader *only if* loading takes longer than 300ms
+}
+
+function hideLoader(forceShow = true) {
+    clearTimeout(loaderTimeout); // in case loading finished fast
+
+    const loader = document.getElementById('loader');
+
+    if (forceShow !== false) {
+        // Hide immediately when done
+        loader.style.display = 'none';
+    } else {
+        // Show immediately (e.g. on page load)
+        loader.style.display = 'flex';
+    }
+}
 async function isUserLoggedIn() {
     try {
         const res = await fetch('./php/is_logged_in.php');
         const result = await res.json();
-        if (result.isLoggedIn) {
+        if (result.loggedIn) {
             return result;
         } else {
             return false;
@@ -91,28 +114,32 @@ async function isUserLoggedIn() {
         return console.error('Error checking login status:', err);;
     }
 }
+
 async function header() {
     const header = document?.querySelector(".header_landing");
     if (!header) return console.error("header is absent");
 
     const [filtersRes, isLoggedIn, cartAmountRes] = await Promise.all([
-        fetch("./php/get_header_filters.php").then(res => res.json()),
+        fetch("./php/get_filters.php?header=1").then(res => res.json()),
         isUserLoggedIn(),
         fetch("./php/get_cart_amount.php").then(res => res.json())
     ]);
 
     const data = filtersRes;
     const cartAmount = cartAmountRes.amount;
+    console.log(isLoggedIn);
 
-    const buildDropdown = (label, name, values) => {
+    const buildDropdown = (label, values) => {
         return `
             <div class="dropdown">
                 <button href="#" class="dropdown_btn">${label}</button>
-                <div class="dropdown_content">
-                    ${values.map(val => {
-                        const encoded = encodeURIComponent(val);
-                        return `<a href="./catalog.html?${name}=${encoded}">${val}</a>`;
-                    }).join('')}
+                <div class="dropdown_content ${label == "Вкус" || label == "Вес" ? "last" : ""}">
+                    <div class="dropdown_content_div">
+                        ${values.map(val => {
+                            const encoded = encodeURIComponent(val);
+                            return `<a href="./catalog.html?${encodeURIComponent(label)}=${encoded}">${val}</a>`;
+                        }).join('')}
+                    </div>
                 </div>
             </div>`;
     };
@@ -151,11 +178,11 @@ async function header() {
             </section>
             <nav class="header_bottom center">
                 <a href="./catalog.html">Каталог</a>
-                ${buildDropdown('Тип', 'type', data.type)}
-                ${buildDropdown('Категория', 'category', data.category)}
+                ${buildDropdown('Тип', data.type)}
+                ${buildDropdown('Категория', data.category)}
                 <a href="./catalog.html?sale=1">Скидки</a>
-                ${buildDropdown('Размер', 'size', data.size)}
-                ${buildDropdown('Вкус', 'flavour', data.flavour)}
+                ${buildDropdown('Вес', data.size)}
+                ${buildDropdown('Вкус', data.flavour)}
             </nav>
         </div>
     `;
@@ -229,37 +256,27 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener('DOMContentLoaded', () => {
     const page = document.querySelector(".catalog");
     if (!page) return;
-
-    const labelToFieldMap = {
-        'Вкус': 'Flavour',
-        'Вес': 'Size',
-        'Категория': 'Category',
-        'Тип': 'Type'
-    };
-    const fieldToLabelMap = Object.fromEntries(
-        Object.entries(labelToFieldMap).map(([k, v]) => [v, k])
-    );
-
+    
     // Load filters and render them
     fetch('./php/get_filters.php')
         .then(response => response.json())
         .then(data => {
             const filtersContainer = document.getElementById('filters');
             filtersContainer.innerHTML = '';
+
             for (const [filterName, options] of Object.entries(data)) {
                 const fieldset = document.createElement('fieldset');
                 const legend = document.createElement('legend');
                 legend.textContent = filterName;
                 fieldset.appendChild(legend);
-
                 options.forEach(option => {
                     const label = document.createElement('label');
-                    const radio = document.createElement('input');
-                    radio.type = 'radio';
-                    radio.name = filterName;
-                    radio.value = option.value;
+                    const input = document.createElement('input');
+                    input.type = (filterName === 'Вкус') ? 'checkbox' : 'radio';
+                    input.name = filterName;
+                    input.value = option.value;
 
-                    label.appendChild(radio);
+                    label.appendChild(input);
                     label.append(` ${option.value} (${option.count})`);
                     fieldset.appendChild(label);
                 });
@@ -267,16 +284,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 filtersContainer.appendChild(fieldset);
             }
 
-            // Set filters and sort based on URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.forEach((value, key) => {
-                const label = fieldToLabelMap[key];
-                if (label) {
-                    const radio = document.querySelector(`#filters input[name="${label}"][value="${value}"]`);
-                    if (radio) {
-                        radio.checked = true;
+                const inputs = document.querySelectorAll(`#filters input[name="${key}"]`);
+                inputs.forEach(input => {
+                    if (input.value === value || value.split(',').includes(input.value)) {
+                        input.checked = true;
                     }
-                }
+                });
             });
 
             const sortParam = urlParams.get('sort');
@@ -285,42 +300,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 sortSelect.value = sortParam;
             }
 
-            // Add event listeners to all radios to trigger filtering on change
-            filtersContainer.querySelectorAll('input[type=radio]').forEach(radio => {
-                radio.addEventListener('change', () => {
-                    const filters = gatherFilters(labelToFieldMap);
+            filtersContainer.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(input => {
+                input.addEventListener('change', () => {
+                    const filters = gatherFilters();
                     fetchFilteredProducts(filters);
+                    showLoaderDelayed();
                 });
             });
 
-            // Initial fetch of products with current filters
-            const filters = gatherFilters(labelToFieldMap);
+            const filters = gatherFilters();
             fetchFilteredProducts(filters);
 
-            // Menu collapse button
-            const menu_btn = document.getElementById("collapse_menu")
+            const menu_btn = document.getElementById("collapse_menu");
             menu_btn.addEventListener("click", () => {
-                const menu = document.querySelector(".catalog__side_menu")
-                const grid = document.querySelector(".catalog__products_grid")
-                menu.classList.toggle("close")
-                grid.classList.toggle("more")
+                document.querySelector(".catalog__side_menu").classList.toggle("close");
+                document.querySelector(".catalog__products_grid").classList.toggle("more");
             });
         })
         .catch(error => console.error('Error fetching filters:', error));
 });
 
-// Modified to accept label-field map
-function gatherFilters(labelToFieldMap) {
+function gatherFilters() {
     const filters = {};
     document.querySelectorAll('#filters fieldset').forEach(fieldset => {
-        const label = fieldset.querySelector('legend').textContent;
-        const selected = fieldset.querySelector('input[type="radio"]:checked');
-        if (selected && labelToFieldMap[label]) {
-            filters[labelToFieldMap[label]] = selected.value;
+        const Oldlabel = fieldset.querySelector('legend').textContent;
+        const transition = {
+            'Вкус':'Flavour',
+            'Категория':'Category',
+            'Тип':'Type',
+            'Вес':'Size'
+        }
+        const label = transition[Oldlabel]
+        const inputs = fieldset.querySelectorAll('input:checked');
+        if (inputs.length > 0) {
+            const values = Array.from(inputs).map(input => input.value);
+            filters[label] = (label === 'Flavour') ? values.join(',') : values[0];
         }
     });
     return filters;
 }
+
 
 function fetchFilteredProducts(filters) {
     const sortSelect = document.getElementById('sort-select');
@@ -329,7 +348,6 @@ function fetchFilteredProducts(filters) {
     if (sortValue) {
         filters['sort'] = sortValue;
     }
-
     const query = new URLSearchParams(filters).toString();
     fetch(`./php/get_products.php?${query}`)
         .then(response => response.json())
@@ -337,7 +355,6 @@ function fetchFilteredProducts(filters) {
             const grid = document.querySelector('.catalog__products_grid');
             const amountElem = document.querySelector('.amount_products');
 
-            // --- 🔽 Apply sorting manually here ---
             if (sortValue === 'price-asc') {
                 products.sort((a, b) => {
                     const priceA = a.Second_price ? parseFloat(a.Second_price) : parseFloat(a.Price);
@@ -372,13 +389,13 @@ function fetchFilteredProducts(filters) {
                     return priceA - priceB;
                 });
             }
-            // --- 🔼 Done sorting ---
 
             grid.innerHTML = '';
             amountElem.textContent = `Найдено товаров: ${products.length}`;
 
             if (products.length === 0) {
-                grid.innerHTML = '<p>Товары не найдены.</p>';
+                grid.innerHTML = '<p style="font-size:24px;">Товары не найдены.</p>';
+                hideLoader();
                 return;
             }
 
@@ -387,7 +404,7 @@ function fetchFilteredProducts(filters) {
                 card.className = 'catalog__products_card';
                 card.innerHTML = `
                     <a href="product.html?id=${product.id}">
-                        <img src="./img/catalog/id-${product.id}/${product.image}" alt="">
+                        <img src="./img/catalog/id-${product.id}/${product.image}" alt="" loading="lazy">
                     </a>
                     <h4>${product.NewName} - ${product.Flavour} - ${product.Size}</h4>
                     <div>${product.Rating ?? 0} ★ (${product.ReviewCount} отзывов)</div>
@@ -399,6 +416,7 @@ function fetchFilteredProducts(filters) {
                 `;
                 grid.appendChild(card);
             });
+            hideLoader();
         })
         .catch(error => console.error('Ошибка загрузки товаров:', error));
 }
@@ -419,6 +437,9 @@ document?.getElementById('clear-filters')?.addEventListener('click', () => {
     document.querySelectorAll('#filters input[type="radio"]').forEach(radio => {
         radio.checked = false;
     });
+    document.querySelectorAll('#filters input[type="checkbox"]').forEach(radio => {
+        radio.checked = false;
+    });
     const filters = gatherFilters({
         'Вкус': 'Flavour',
         'Вес': 'Size',
@@ -426,13 +447,13 @@ document?.getElementById('clear-filters')?.addEventListener('click', () => {
         'Тип': 'Type'
     });
     fetchFilteredProducts(filters);
+    hideLoader(false)
 });
 
 document.addEventListener('DOMContentLoaded', () => {
     const registerPage = document.querySelector(".register");
     if (!registerPage) return;
 
-    console.log("form"); // ✅ This should now run
 
     const form = document.querySelector('.register_form');
     const message = document.querySelector('main.register .error_msg');
@@ -578,48 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-async function loadProduct(productId) {
-    const res = await fetch(`./php/getVariants.php?id=${productId}`);
-    const data = await res.json();
-    console.log(data);
-    const variants = data.variants;
-    const desc = data.description;
-    console.log(data);
-    let current = variants[0]; // pick default (or find based on current flavour/size)
 
-    // Set product name
-    const fullName = `${desc.name} ${current.Flavour} ${current.Size}`;
-    document.querySelector("h1").textContent = fullName;
-    document.querySelector(".link_tree p:last-of-type").textContent = fullName;
-
-    // Overview sections (assumes 3)
-    const overviewHTML = [
-        { title: "Обзор", content: desc.overview },
-        { title: "Как принимать", content: desc.suggest },
-        { title: "Преимущества", content: desc.benefits }
-    ].map((section, i) => `
-        <section>
-            <a href="#" class="toggle-overview" data-index="${i}">
-                ${section.title} <span><</span>
-            </a>
-            <div class="overview-content">${section.content.replaceAll("###", "<br><br>")}</div>
-        </section>
-    `).join("");
-
-    document.querySelector(".product__overview").innerHTML = overviewHTML;
-    // Toggle overview section visibility
-    document.querySelectorAll(".toggle-overview").forEach(link => {
-        link.addEventListener("click", e => {
-            e.preventDefault();
-            const section = link.parentElement;
-            section.classList.toggle("open");
-        });
-    });
-    
-    // Benefits (as list items)
-    const benefitList = desc.list.split("###").map(line => `<li>${line}</li>`).join("");
-    document.querySelector(".product_listBenef").innerHTML = benefitList;
-}
 
 document.addEventListener("DOMContentLoaded", async () => {
     const page = document.querySelector(".product");
@@ -627,19 +607,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     let productIDNew = 0;
     const productId = new URLSearchParams(window.location.search).get("id");
 
-    if (productId) {
-        loadProduct(productId)
-    }
 
     const flavourSelect = document.getElementById("flavour-select");
     const sizeSection = document.querySelector(".product__size");
     const sizeButtonsContainer = document.getElementById("size-buttons");
     const priceSection = document.getElementById("price-section");
 
-    const qtyInput = document.getElementById("qty-input");
-    const qtyMinus = document.getElementById("qty-minus");
-    const qtyPlus = document.getElementById("qty-plus");
-    const qtyError = document.getElementById("qty-error");
+    let amount_avbl = 1;
+    let qtyInput = document.getElementById("qty-input");
+    let qtyMinus = document.getElementById("qty-minus");
+    let qtyPlus = document.getElementById("qty-plus");
+    let qtyError = document.getElementById("qty-error");
 
     let productVariants = [];
     let selectedProduct = null;
@@ -678,7 +656,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const filtered = productVariants.variants.filter(p => p.Flavour === flavour);
 
         sizeButtonsContainer.innerHTML = "";
-
+        let autoSelect = filtered.length == 1 ?? true
         filtered.forEach(p => {
             const btn = document.createElement("button");
             const isOutOfStock = parseInt(p.Amount_avbl) === 0;
@@ -687,7 +665,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             btn.dataset.price = p.Price;
             btn.dataset.second_price = p.Second_price;
             btn.dataset.id = p.id;
-
+            btn.dataset.amount = p.Amount_avbl;
             if (isOutOfStock) {
                 btn.disabled = true;
                 btn.classList.add("out-of-stock");
@@ -698,8 +676,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     productIDNew = btn.dataset.id
                     renderReviewsSection();
                     document.getElementById("product__rating").innerHTML = p.Rating ? `<div> ${p.Rating} ★ (${p.ReviewCount} отзывов)</div>` : "У этого товара нет оценок"
+                    loadProduct(productIDNew);
+                    amount_avbl = p.Amount_avbl
+                    setupQtyControls();
                 });
-                if (p.Size === preselectSize) {
+                if (p.Size === preselectSize || autoSelect) {
                     setTimeout(() => btn.click(), 0);
                 }
             }
@@ -713,12 +694,72 @@ document.addEventListener("DOMContentLoaded", async () => {
         priceSection.style.display = "none";
     }
 
+    async function loadProduct(productId) {
+        const res = await fetch(`./php/getVariants.php?id=${productId}`);
+        const data = await res.json();
+        const variants = data.variants;
+        const desc = data.description;
+        let current = variants.filter((product) => product.id == productId)[0];
+        const url = new URL(window.location);
+        url.searchParams.set("id", current.id);
+        window.history.replaceState({}, "", url);
+        productSlider();
+
+        // Set product name
+        const fullName = `${desc.name} ${current.Flavour} ${current.Size}`;
+        document.querySelector("h1").textContent = fullName;
+        document.querySelector(".link_tree p:last-of-type").textContent = fullName;
+
+        // Overview sections (assumes 3)
+        const overviewHTML = [
+            { title: "Обзор", content: desc.overview },
+            { title: "Как принимать", content: desc.suggest },
+            { title: "Преимущества", content: desc.benefits }
+        ].map((section, i) => {
+            let contentHTML;
+
+            if (section.title === "Преимущества") {
+                const listItems = section.content
+                    .split("###")
+                    .filter(item => item.trim() !== "")
+                    .map(item => `<li style="list-style-position:inside;">${item.trim()}</li>`)
+                    .join("");
+
+                contentHTML = `<ul>${listItems}</ul>`;
+            } else {
+                contentHTML = section.content.replaceAll("###", "<br><br>");
+            }
+
+            return `
+                <section>
+                    <a href="#" class="toggle-overview" data-index="${i}">
+                        ${section.title} <span><</span>
+                    </a>
+                    <div class="overview-content">${contentHTML}</div>
+                </section>
+            `;
+        }).join("");
+
+        document.querySelector(".product__overview").innerHTML = overviewHTML;
+        // Toggle overview section visibility
+        document.querySelectorAll(".toggle-overview").forEach(link => {
+            link.addEventListener("click", e => {
+                e.preventDefault();
+                const section = link.parentElement;
+                section.classList.toggle("open");
+            });
+        });
+        
+        // Benefits (as list items)
+        const benefitList = desc.list.split("###").map(line => `<li>${line}</li>`).join("");
+        document.querySelector(".product_listBenef").innerHTML = benefitList;
+    }
     // Helper: Update price display
     function updatePrice(price, secondPrice) {
         if (secondPrice != null) {
-            priceSection.innerHTML = `<span class="before">${price} $</span><span class="after">${secondPrice} $</span>`
+            priceSection.innerHTML = `<span class="before">${price} ₽</span><span class="after">${secondPrice} ₽</span>`
         } else {
-            priceSection.textContent = `${price} $`;
+            priceSection.textContent = `${price} ₽`;
         }
         priceSection.style.display = "flex";
     }
@@ -729,40 +770,61 @@ document.addEventListener("DOMContentLoaded", async () => {
         activeBtn.classList.add("selected");
     }
 
-    // Quantity controls
+    
+    function setupQtyControls() {
+
+        // Clone nodes to remove existing event listeners
+        const qtyInputClone = qtyInput.cloneNode(true);
+        const qtyMinusClone = qtyMinus.cloneNode(true);
+        const qtyPlusClone = qtyPlus.cloneNode(true);
+
+        qtyInput.parentNode.replaceChild(qtyInputClone, qtyInput);
+        qtyMinus.parentNode.replaceChild(qtyMinusClone, qtyMinus);
+        qtyPlus.parentNode.replaceChild(qtyPlusClone, qtyPlus);
+
+        // Update references
+        qtyInput = qtyInputClone;
+        qtyMinus = qtyMinusClone;
+        qtyPlus = qtyPlusClone;
+
+        qtyMinus.addEventListener("click", onMinusClick);
+        qtyPlus.addEventListener("click", onPlusClick);
+        qtyInput.addEventListener("input", onQtyInput);
+
+        updateQtyControls();
+    }
+
     function updateQtyControls() {
         const value = parseInt(qtyInput.value) || 1;
         qtyMinus.disabled = value <= 1;
-        qtyPlus.disabled = value >= 50;
+        qtyPlus.disabled = value >= amount_avbl;
         qtyMinus.classList.toggle("btn--disabled", value <= 1);
-        qtyPlus.classList.toggle("btn--disabled", value >= 50);
-        qtyError.style.display = value > 50 ? "block" : "none";
+        qtyPlus.classList.toggle("btn--disabled", value >= amount_avbl);
+        qtyError.style.display = value > amount_avbl ? "block" : "none";
     }
 
-    qtyMinus.addEventListener("click", () => {
+    function onMinusClick() {
         let val = parseInt(qtyInput.value) || 1;
         if (val > 1) qtyInput.value = val - 1;
         updateQtyControls();
-    });
+    }
 
-    qtyPlus.addEventListener("click", () => {
+    function onPlusClick() {
         let val = parseInt(qtyInput.value) || 1;
-        if (val < 50) qtyInput.value = val + 1;
+        if (val < amount_avbl) qtyInput.value = val + 1;
         updateQtyControls();
-    });
+    }
 
-    qtyInput.addEventListener("input", () => {
+    function onQtyInput() {
         let val = parseInt(qtyInput.value);
         if (isNaN(val) || val < 1) val = 1;
-        if (val > 50) {
-            qtyInput.value = 50;
+        if (val > amount_avbl) {
+            qtyInput.value = amount_avbl;
         } else {
             qtyInput.value = val;
         }
         updateQtyControls();
-    });
-
-    updateQtyControls(); // initial
+    }
 
     document.getElementById("cart_product").addEventListener("click", async () => {
         const qty = parseInt(qtyInput.value) || 1;
@@ -774,8 +836,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        const productId = selectedSizeBtn.dataset.Pid;
-
+        const productId = selectedSizeBtn.dataset.id;
         const formData = new FormData();
         formData.append("Product_id", productId);
         formData.append("Amount", qty);
@@ -815,7 +876,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
                 <div class="review_right">
                     <h3>${review.Title}</h3>
-                    <p class="review_rate">Оценка: ${review.Rating}/5</p>
+                    <p class="review_rate">Оценка: ${review.Rating} ★</p>
                     <p>${review.Text}</p>
                 </div>
             </div>
@@ -841,14 +902,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         const container = document.getElementById('reviews-container');
         const reviews = await fetchReviews();
         const isLoggedIn = await isUserLoggedIn();
-
         container.innerHTML = `
-            ${isLoggedIn ? getReviewForm() : ''}
             <h1>Отзывы других пользователей</h1>
-            ${reviews.map(renderReview).join('')}
+            ${reviews.length ? reviews.map(renderReview).join('') : `<p style="font-size: 24px;">Отзывы отсутствуют</p>`}
         `;
-
         if (isLoggedIn) {
+            container.innerHTML = `
+                ${isLoggedIn ? getReviewForm() : ''}
+                <h1>Отзывы других пользователей</h1>
+                ${reviews.length ? reviews.map(renderReview).join('') : `<p style="font-size: 24px;">Отзывы отсутствуют</p>`}
+            `;
             const form = document.getElementById('review-form');
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -874,8 +937,58 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
     }
+    function productSlider() {
+        const productId = new URLSearchParams(window.location.search).get("id"); 
+        let imageList = [];
+        let currentIndex = 0;
+        async function fetchImages() {
+            const res = await fetch(`./php/get_images.php?product_id=${productId}`);
+            imageList = await res.json();
+            // Sort by ID if needed
+            imageList.success.sort((a, b) => a.Selection - b.Selection);
+            renderThumbnails();
+            showImage(0);
+        }
 
+        function renderThumbnails() {
+            const container = document.getElementById('thumbs-container');
+            container.innerHTML = '';
+            imageList.success.forEach((img, idx) => {
+                const thumb = document.createElement('img');
+                thumb.src = `./img/catalog/id-${productId}/${img.URL}`;
+                thumb.dataset.index = idx;
+                thumb.onclick = () => showImage(idx);
+                container.appendChild(thumb);
+            });
+        }
+
+        function showImage(index) {
+            currentIndex = index;
+            document.getElementById('main-image').src = `./img/catalog/id-${productId}/${imageList.success[index].URL}`;
+
+            // Highlight selected thumb
+            document.querySelectorAll('#thumbs-container img').forEach(img => img.classList.remove('selected'));
+            document.querySelector(`#thumbs-container img[data-index="${index}"]`).classList.add('selected');
+        }
+
+        document.querySelector('.nav.left').onclick = () => {
+            if (currentIndex > 0) showImage(currentIndex - 1);
+        };
+        document.querySelector('.nav.right').onclick = () => {
+            if (currentIndex < imageList.success.length - 1) showImage(currentIndex + 1);
+        };
+
+        document.querySelector('.arrow.up').onclick = () => {
+            document.getElementById('thumbs-container').scrollTop -= 60;
+        };
+        document.querySelector('.arrow.down').onclick = () => {
+            document.getElementById('thumbs-container').scrollTop += 60;
+        };
+
+        fetchImages();
+    }
 });
+
 
 document.addEventListener("DOMContentLoaded", () => {
     const buttons = document.querySelectorAll(".admin__top_button");
@@ -914,33 +1027,46 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-document.addEventListener("input", (e) => {
+document.addEventListener("blur", (e) => {
     if (e.target.tagName === "TD" && e.target.hasAttribute("contenteditable")) {
         const id = e.target.dataset.id;
         const column = e.target.dataset.column;
         const table = e.target.closest("table").id;
-        const value = e.target.innerText;
+        const value = e.target.innerText.trim(); // remove accidental whitespace
+
+        // Optionally: skip update if value is unchanged from before
+        // You'd need to store original value on focus if you want that
 
         fetch("./php/admin_update.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ table, id, column, value })
-        });
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const tableElem = document.getElementById(table);
+                const reloadEvent = new Event('click');
+                document.querySelector(`[data-target="${table}"]`).dispatchEvent(reloadEvent);
+            } 
+        })
     }
-});
+}, true);
 
 document.addEventListener("click", (e) => {
     if (e.target.classList.contains("delete-btn")) {
         const id = e.target.dataset.id;
         const table = e.target.closest("table").id;
-
-        fetch("./php/admin_delete.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ table, id })
-        }).then(() => {
-            e.target.closest("tr").remove();
-        });
+        const check = confirm("Вы уверенны?")
+        if (check) {
+            fetch("./php/admin_delete.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ table, id })
+            }).then(() => {
+                e.target.closest("tr").remove();
+            }); 
+        }
+        
     }
 });
 
@@ -1053,13 +1179,11 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", async () => {
     const container = document.getElementById("cart-container");
     const summarySection = document.querySelector(".cart__right");
+    const loginCheck = await isUserLoggedIn();
     if (!container || !summarySection) return;
-
-    const authRes = await fetch("./php/is_logged_in.php");
-    const authData = await authRes.json();
-
-    if (!authData.loggedIn) {
-        container.innerHTML = `<p style="color: red;">Пожалуйста, войдите в аккаунт, чтобы увидеть корзину.</p>`;
+    if (loginCheck == false) {
+        container.innerHTML = `<p style="color: red; font-size:24px;">Пожалуйста, войдите в аккаунт, чтобы увидеть корзину.</p>`;
+        summarySection.classList.toggle("hide")
         return;
     }
 
@@ -1089,13 +1213,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         const cartData = await fetchCart();
         container.innerHTML = '';
         if (cartData.error) {
-            container.innerHTML = `<p style="color: red;">${cartData.error}</p>`;
+            container.innerHTML = `<p style="color: red; font-size:24px;">${cartData.error}</p>`;
             return;
         }
 
         const items = cartData.cart;
         if (items.length === 0) {
-            container.innerHTML = `<p>Корзина пуста.</p>`;
+            container.innerHTML = `<p style="font-size:24px;">Корзина пуста.</p>`;
             summarySection.innerHTML = '';
             return;
         }
@@ -1157,7 +1281,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const checkoutBtn = document.getElementById("checkout-btn");
         if (checkoutBtn) {
             checkoutBtn.addEventListener("click", async () => {
-                console.log(checkoutBtn);
                 const confirmOrder = confirm("Подтвердить заказ?");
                 if (!confirmOrder) return;
 
@@ -1171,7 +1294,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     alert("Заказ успешно оформлен!");
                     renderCart(); // Refresh cart after order
                 } else {
-                    alert("Ошибка при оформлении заказа: " + data.error);
+                    alert(data.error);
                 }
             });
         }
@@ -1224,12 +1347,10 @@ function fetchOrderHistory() {
                 grid.innerHTML = '<p>У вас ещё нет заказов.</p>';
                 return;
             }
-
             orders.forEach(order => {
                 const card = document.createElement('div');
                 card.className = 'catalog__products_card'; // reuse styling
                 const orderDate = new Date(order.Date).toLocaleDateString('ru-RU');
-                console.log(order);
                 card.innerHTML = `
                     <a href="product.html?id=${order.Product_id}">
                         <img src="./img/catalog/id-${order.Product_id}/${order.image}" alt="">
@@ -1237,6 +1358,7 @@ function fetchOrderHistory() {
                     <h4>${order.NewName} - ${order.Flavour} - ${order.Size}</h4>
                     <p><b>Количество:</b> ${order.Amount}</p>
                     <p><b>Дата заказа:</b> ${orderDate}</p>
+                    <p><b>Статус:</b> ${order.Status}</p>
                 `;
                 grid.appendChild(card);
             });
@@ -1245,10 +1367,9 @@ function fetchOrderHistory() {
             console.error('Ошибка при загрузке истории заказов:', err);
         });
 }
-
-// Call when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     if (document.querySelector('.history__grid')) {
         fetchOrderHistory();
     }
 });
+

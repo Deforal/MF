@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="./img/logos/logo1.svg">
-    <title>Главная</title>
+    <title>Страница товара</title>
 </head>
 <body>
     <header class="header_landing">
@@ -24,7 +24,16 @@
         </nav>
         <section class="product__top">
             <div class="product__imges">
-                <img src="./img/catalog/id-1/0.webp" alt="">
+                <div class="product__imges_left">
+                    <button class="arrow up">&#9650;</button>
+                    <div class="thumbs_container" id="thumbs-container"></div>
+                    <button class="arrow down">&#9660;</button>
+                </div>
+                <div class="product__imges_right">
+                    <button class="nav left">&#10094;</button>
+                    <img id="main-image" src="" alt="Product Image">
+                    <button class="nav right">&#10095;</button>
+                </div>
             </div>
             <div class="product__top_right">
                 <h1>Lorem ipsum dolor sit amet consectetur.</h1>
@@ -53,7 +62,7 @@
                     <div class="product__amount_bottom">
                         <div class="product__amount_amount">
                             <button id="qty-minus">-</button>
-                            <input type="number" id="qty-input" min="1" max="50" value="1">
+                            <input type="number" id="qty-input" value="1">
                             <button id="qty-plus">+</button>
                         </div>
                         <button id="cart_product" class="product__order">В корзину</button>

@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="11.8mm"
-   height="7.3000002mm"
-   viewBox="0 0 11.8 7.3000002"
+   width="12.8mm"
+   height="12.3mm"
+   viewBox="0 0 12.8 12.3"
    version="1.1"
    id="svg5"
    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
@@ -25,8 +25,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="11.930303"
-     inkscape:cx="30.300991"
-     inkscape:cy="2.2631445"
+     inkscape:cx="30.636271"
+     inkscape:cy="22.631445"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
@@ -39,11 +39,18 @@
      inkscape:label="Слой 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0;stroke-opacity:0"
+       id="rect842"
+       width="12.907257"
+       height="12.485887"
+       x="-0.022177244"
+       y="-0.022177244" />
     <g
        aria-label="MF"
        id="text6913"
        style="font-style:italic;font-size:9.87777px;-inkscape-font-specification:'sans-serif, Italic';text-align:center;text-anchor:middle;fill:#ff0000;stroke-width:0.264583"
-       transform="translate(-22.611039,-31.666218)">
+       transform="translate(-21.945717,-29.049282)">
       <path
          d="m 28.43677,38.857611 -0.385241,-0.0028 1.418001,-6.101259 c 0,0 -1.876627,2.396413 -3.017792,4.0018 -0.09645,0.135687 -0.320016,0.129099 -0.3529,-3e-6 -0.32219,-1.264878 -1.090479,-4.300789 -1.090479,-4.300789 l -1.495395,6.400248 h -0.901925 l 1.659156,-7.18164 c 0,0 1.417443,-0.03897 1.567058,0.06765 0.149615,0.106623 0.681017,3.708953 0.681017,3.708953 0,0 1.262811,-1.920063 2.3393,-3.504071 0.248615,-0.365826 1.817742,-0.233719 1.817742,-0.233719 z"
          style="fill:#ffffff"

@@ -31,8 +31,15 @@ $stmt = $pdo->prepare("INSERT INTO Users (Name, Email, Phone, Birth, Gender, Pas
 $success = $stmt->execute([$name, $email, $phone, $birth, $gender, $hashedPass]);
 
 if ($success) {
-    $_SESSION['user_id'] = $pdo->lastInsertId();
-    $_SESSION['user_name'] = $name;
+    $userId = $pdo->lastInsertId();
+
+    // 🔍 Fetch the user row (but exclude password)
+    $stmt = $pdo->prepare("SELECT id, Role, Name, Email, Phone, Birth, Gender FROM Users WHERE id = ?");
+    $stmt->execute([$userId]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $_SESSION['user'] = $user;
+
     echo json_encode(['success' => true]);
 } else {
     echo json_encode(['success' => false, 'message' => 'Ошибка регистрации.']);

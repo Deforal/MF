@@ -1,5 +1,7 @@
 <?php
 require_once './db.php';
+require_once 'is_admin.php';
+require_admin();
 
 $table = $_POST['table'] ?? '';
 $allowedTables = ['products', 'descriptions', 'images', 'users', 'cart', 'favs', 'review'];
@@ -18,7 +20,10 @@ try {
 
     $data = [];
     foreach ($insertCols as $col) {
-        $data[":$col"] = $_POST[$col] ?? null;
+        $value = trim($_POST[$col] ?? '');
+
+        // Convert empty string to NULL
+        $data[":$col"] = $value === '' ? null : $value;
     }
 
     $stmt->execute($data);

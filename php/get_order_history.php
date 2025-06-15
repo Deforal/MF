@@ -12,7 +12,7 @@ if (!$userId) {
 
 try {
     $stmt = $pdo->prepare("
-        SELECT o.id, o.Product_id, o.Amount, o.Date,
+        SELECT o.id, o.Product_id, o.Amount, o.Date, o.Status,
                p.Flavour, p.Size, d.Name AS NewName,
                (SELECT URL FROM images WHERE Product_id = p.id AND Selection = 0 LIMIT 1) AS image
         FROM Orders o
