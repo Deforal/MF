@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Static Pages -->
+  <url><loc>https://example.com/index.html</loc></url>
+  <url><loc>https://example.com/return.html</loc></url>
+  <url><loc>https://example.com/quality.html</loc></url>
+  <url><loc>https://example.com/profile.html</loc></url>
+  <url><loc>https://example.com/offices.html</loc></url>
+  <url><loc>https://example.com/history.html</loc></url>
+  <url><loc>https://example.com/enviroment.html</loc></url>
+  <url><loc>https://example.com/cart.html</loc></url>
+  <url><loc>https://example.com/about.html</loc></url>
+
+  <!-- Dynamic Product Examples -->
+  <url><loc>https://example.com/product.html?id=1</loc></url>
+  <url><loc>https://example.com/product.html?id=2</loc></url>
+  <url><loc>https://example.com/product.html?id=3</loc></url>
+
+  <!-- Catalog with one param examples -->
+  <url><loc>https://example.com/catalog.html?тип=напиток</loc></url>
+  <url><loc>https://example.com/catalog.html?вес=500г</loc></url>
+  <url><loc>https://example.com/catalog.html?вкус=шоколад</loc></url>
+  <url><loc>https://example.com/catalog.html?категория=энергетики</loc></url>
+</urlset>

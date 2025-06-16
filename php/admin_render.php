@@ -4,12 +4,7 @@ require_once 'is_admin.php';
 require_admin();
 
 $table = $_GET['table'] ?? '';
-$allowedTables = ['products', 'descriptions', 'images', 'users', 'cart', 'favs', 'review', 'orders', 'product_flavours'];
 
-if (!in_array($table, $allowedTables)) {
-    echo "<tr><td>Неверный параметр таблицы</td></tr>";
-    exit;
-}
 
 try {
     if ($table == 'images') {
@@ -83,7 +78,11 @@ try {
                 $id = htmlspecialchars($row['id'] ?? '');
                 $html .= "<td contenteditable='true' data-column='{$col}' data-id='{$id}'>{$value}</td>";
             }
-            $html .= "<td><button class='delete-btn' data-id='{$id}'>Удалить</button></td>";
+            if ($table == "Users" && $row["id"] == $_SESSION['user']['id']) {
+                $html .= "<td><p>Ваш аккаунт</p></td>";
+            } else {
+                $html .= "<td><button class='delete-btn' data-id='{$id}'>Удалить</button></td>";
+            }
             $html .= "</tr>";
         }
     } else {

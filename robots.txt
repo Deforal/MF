@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /admin_panel.html
+Disallow: /login.html
+Disallow: /register.html
+
+# Allow catalog and product pages with one query parameter
+Allow: /product.html
+Allow: /catalog.html
+
+# Sitemap reference
+Sitemap: https://example.com/sitemap.xml

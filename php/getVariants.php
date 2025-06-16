@@ -33,7 +33,7 @@ $variantStmt = $pdo->prepare("
         (SELECT URL FROM Images WHERE Images.Product_id = p.id AND Selection = 0 LIMIT 1) AS image,
         (SELECT COUNT(*) FROM Review WHERE Review.Product_id = p.id) AS ReviewCount,
         (SELECT ROUND(AVG(Rating), 1) FROM Review WHERE Review.Product_id = p.id) AS Rating,
-        CONCAT(p.Group_id, ' ', d.Name, ' ', p.Flavour, ' ', p.Size) AS NewName
+        CONCAT(d.Name, ' ', p.Flavour, ' ', p.Size) AS NewName
     FROM Products p
     JOIN Descriptions d ON p.Group_id = d.id
     WHERE p.Group_id = ?

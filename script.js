@@ -127,7 +127,6 @@ async function header() {
 
     const data = filtersRes;
     const cartAmount = cartAmountRes.amount;
-    console.log(isLoggedIn);
 
     const buildDropdown = (label, values) => {
         return `
@@ -148,18 +147,22 @@ async function header() {
         <div class="profile_icon_wrapper">
             <img src="./img/logos/Profile.svg" alt="" class="profile_icon link_like">
             <div class="profile_dropdown hidden">
-                ${isLoggedIn.user.Role == 1 ? `<a href ="./admin_panel.html" class="link_like"> Админ панель </a>` : ``}
-                <a href="./profile.html" class="link_like">Профиль</a>
-                <a class="link_like" href="./history.html">История заказов</p>
-                <a class="link_like" href="./php/logout.php">Выйти</a>
+                <div class="profile_dropdown_div">
+                    ${isLoggedIn.user.Role == 1 ? `<a href ="./admin_panel.html" class="link_like"> Админ панель </a>` : ``}
+                    <a href="./profile.html" class="link_like">Профиль</a>
+                    <a class="link_like" href="./history.html">История заказов</p>
+                    <a class="link_like" href="./php/logout.php">Выйти</a>
+                </div>
             </div>
         </div>`
         : `
             <div class="dropdown">
-                <img src="./img/logos/Profile.svg" alt="" class="dropdown_btn">
-                <div class="dropdown_content">
-                    <a href="./register.html">Регистрация</a>
-                    <a href="./login.html">Вход</a>
+                <div class="profile_dropdown_div">
+                    <img src="./img/logos/Profile.svg" alt="" class="dropdown_btn">
+                    <div class="dropdown_content">
+                        <a href="./register.html">Регистрация</a>
+                        <a href="./login.html">Вход</a>
+                    </div>
                 </div>
             </div>
         `;
@@ -167,7 +170,10 @@ async function header() {
     let string = `
         <div class="header">
             <section class="header_top center">
-                <a href="./index.html"><img src="./img/logos/logo2.svg" alt=""></a>
+                <a class="header_top_left"href="./index.html">
+                <img src="./img/logos/logo2.svg" alt="" class="main">
+                <img src="./img/logos/logo1.svg" alt="" class="small">
+                </a>
                 <div class="header_top_right">
                     ${profileHTML}
                     <div class="header_top_right_cart">
@@ -454,9 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerPage = document.querySelector(".register");
     if (!registerPage) return;
 
-
     const form = document.querySelector('.register_form');
-    const message = document.querySelector('main.register .error_msg');
+    const message = document.querySelector('.error_msg_bottom');
 
     const fieldMap = {
         name: '.reg_name',
@@ -466,6 +471,21 @@ document.addEventListener('DOMContentLoaded', () => {
         pass: '.reg_pass',
         rpass: '.reg_Rpass'
     };
+
+    const phoneInput = document.querySelector(fieldMap.phone);
+    phoneInput.addEventListener('input', (e) => {
+        let x = e.target.value.replace(/\D/g, '').replace(/^8/, '7');
+        if (!x.startsWith('7')) x = '7' + x;
+        if (x.length > 11) x = x.slice(0, 11);
+
+        let formatted = '+7';
+        if (x.length >= 2) formatted += ' (' + x.slice(1, 4);
+        if (x.length >= 5) formatted += ') ' + x.slice(4, 7);
+        if (x.length >= 8) formatted += '-' + x.slice(7, 9);
+        if (x.length >= 10) formatted += '-' + x.slice(9, 11);
+
+        e.target.value = formatted;
+    });
 
     form.addEventListener('submit', async e => {
         e.preventDefault();
@@ -528,16 +548,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await res.json();
             if (result.success) {
-                message.textContent = 'Успешная регистрация!';
+                alert("Успешная регистрация!");
                 window.location.href = './index.html';
             } else {
-                message.textContent = result.message || 'Ошибка регистрации';
+                alert(result.message);
             }
         } catch (err) {
             message.textContent = 'Ошибка при подключении к серверу.';
         }
     });
 });
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -591,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 window.location.href = './index.html';
             } else {
-                message.textContent = result.message || 'Неверный логин или пароль.';
+                alert(result.message)
             }
         } catch (err) {
             message.textContent = 'Ошибка при подключении к серверу.';
@@ -675,7 +696,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     highlightSelectedSize(btn);
                     productIDNew = btn.dataset.id
                     renderReviewsSection();
-                    document.getElementById("product__rating").innerHTML = p.Rating ? `<div> ${p.Rating} ★ (${p.ReviewCount} отзывов)</div>` : "У этого товара нет оценок"
                     loadProduct(productIDNew);
                     amount_avbl = p.Amount_avbl
                     setupQtyControls();
@@ -703,8 +723,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const url = new URL(window.location);
         url.searchParams.set("id", current.id);
         window.history.replaceState({}, "", url);
+        document.getElementById("product__rating").innerHTML = current.Rating ? `<div> ${current.Rating} ★ (${current.ReviewCount} отзывов)</div>` : "У этого товара нет оценок"
         productSlider();
-
         // Set product name
         const fullName = `${desc.name} ${current.Flavour} ${current.Size}`;
         document.querySelector("h1").textContent = fullName;
@@ -904,20 +924,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         const isLoggedIn = await isUserLoggedIn();
         container.innerHTML = `
             <h1>Отзывы других пользователей</h1>
-            ${reviews.length ? reviews.map(renderReview).join('') : `<p style="font-size: 24px;">Отзывы отсутствуют</p>`}
+            ${reviews.length ? reviews.map(renderReview).join('') : `<p style="font-size: 24px; padding-top:24px;">Отзывы отсутствуют</p>`}
         `;
         if (isLoggedIn) {
             container.innerHTML = `
                 ${isLoggedIn ? getReviewForm() : ''}
                 <h1>Отзывы других пользователей</h1>
-                ${reviews.length ? reviews.map(renderReview).join('') : `<p style="font-size: 24px;">Отзывы отсутствуют</p>`}
+                ${reviews.length ? reviews.map(renderReview).join('') : `<p style="font-size: 24px; padding-top:24px;">Отзывы отсутствуют</p>`}
             `;
             const form = document.getElementById('review-form');
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(form);
                 const data = {
-                    product_id: productId,
+                    product_id: productIDNew,
                     title: formData.get('title'),
                     text: formData.get('text'),
                     rating: formData.get('rating')
@@ -931,6 +951,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (res.ok) {
                     renderReviewsSection(); // Refresh the reviews
+                    loadProduct(productIDNew)
                 } else {
                     alert('Error submitting review');
                 }
@@ -1077,7 +1098,6 @@ document.addEventListener("submit", async (e) => {
     const form = e.target;
     const formData = new FormData(form);
     const table = form.dataset.table;
-
     try {
         const response = await fetch('./php/admin_insert.php', {
             method: 'POST',
@@ -1344,7 +1364,7 @@ function fetchOrderHistory() {
             grid.innerHTML = '';
 
             if (!orders.length) {
-                grid.innerHTML = '<p>У вас ещё нет заказов.</p>';
+                grid.innerHTML = '<p style="font-size: 24px;">У вас ещё нет заказов.</p>';
                 return;
             }
             orders.forEach(order => {

@@ -4,11 +4,6 @@ require_once 'is_admin.php';
 require_admin();
 
 $table = $_POST['table'] ?? '';
-$allowedTables = ['products', 'descriptions', 'images', 'users', 'cart', 'favs', 'review'];
-if (!in_array($table, $allowedTables)) {
-    echo "invalid table";
-    exit;
-}
 
 try {
     $columns = $pdo->query("DESCRIBE `$table`")->fetchAll(PDO::FETCH_COLUMN);

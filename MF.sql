@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: MySQL-8.4
--- Время создания: Июн 15 2025 г., 21:45
+-- Время создания: Июн 16 2025 г., 14:27
 -- Версия сервера: 8.4.4
 -- Версия PHP: 8.4.1
 
@@ -33,14 +33,6 @@ CREATE TABLE `Cart` (
   `User_id` int NOT NULL,
   `Amount` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Дамп данных таблицы `Cart`
---
-
-INSERT INTO `Cart` (`id`, `Product_id`, `User_id`, `Amount`) VALUES
-(18, 34, 6, 1),
-(19, 33, 6, 6);
 
 -- --------------------------------------------------------
 
@@ -308,15 +300,6 @@ CREATE TABLE `Orders` (
   `Status` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Дамп данных таблицы `Orders`
---
-
-INSERT INTO `Orders` (`id`, `User_id`, `Product_id`, `Amount`, `Date`, `Status`) VALUES
-(5, 6, 6, 9, '2025-06-04', 'Ожидает'),
-(6, 6, 8, 2, '2025-06-04', 'Ожидает'),
-(7, 6, 7, 4, '2025-06-11', 'Ожидает');
-
 -- --------------------------------------------------------
 
 --
@@ -496,7 +479,7 @@ CREATE TABLE `Users` (
   `Role` int NOT NULL DEFAULT '0',
   `Name` varchar(40) NOT NULL,
   `Email` varchar(100) NOT NULL,
-  `Phone` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `Phone` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `Birth` date NOT NULL,
   `Gender` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `Pass` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
@@ -507,8 +490,8 @@ CREATE TABLE `Users` (
 --
 
 INSERT INTO `Users` (`id`, `Role`, `Name`, `Email`, `Phone`, `Birth`, `Gender`, `Pass`) VALUES
-(1, 0, 'Niger', 'epik@mail.ru', '+79247011548', '2025-04-09', '', 'gg'),
-(6, 1, 'Egor', 'gg@gg.gg', '+7878787', '2008-12-17', 'Мужчина', '$2y$12$FM92wJuG8nMjNEwsUVTFuueG2i/JBuPkpxvWLCdqgswcWP334Ccwa');
+(7, 1, 'nn', 'nn@nn.nn', '+78787017474', '2008-12-10', 'Мужчина', '$2y$12$k95wfy8UjmckmGO3JA8IiuFGODEy9ux79OmcQBbnM2OkInXQCzPSq'),
+(8, 0, 'qq', 'qq@qq.qq', '+7 (789) 888-88-88', '2008-12-02', 'Мужчина', '$2y$12$/dfxG73Vx0pqnEX8x4AY3.3AR1sZA7G6vNqoarR7XMud0FftkjxFW');
 
 --
 -- Индексы сохранённых таблиц
@@ -621,7 +604,7 @@ ALTER TABLE `Review`
 -- AUTO_INCREMENT для таблицы `Users`
 --
 ALTER TABLE `Users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
