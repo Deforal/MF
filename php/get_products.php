@@ -7,13 +7,12 @@ $params = [];
 
 // Base query — join only for GROUP_CONCAT
 $sql = "SELECT Products.*, 
-               GROUP_CONCAT(DISTINCT pf_all.flavour ORDER BY pf_all.flavour SEPARATOR ', ') AS Flavour,
                (SELECT URL FROM Images WHERE Images.Product_id = Products.id AND Selection = 0 LIMIT 1) AS image,
                (SELECT COUNT(*) FROM Review WHERE Review.Product_id = Products.id) AS ReviewCount,
                (SELECT Name FROM Descriptions WHERE Descriptions.id = Products.Group_id ) AS NewName,
                (SELECT ROUND(AVG(Rating),1) FROM Review WHERE Review.Product_id = Products.id) AS Rating
         FROM Products
-        LEFT JOIN Product_Flavours pf_all ON pf_all.product_id = Products.id";
+        LEFT JOIN Product_Flavours pf_all ON pf_all.Product_id = Products.id";
 
 // Filtering
 foreach ($validFilters as $filter) {
@@ -28,11 +27,11 @@ foreach ($validFilters as $filter) {
             }
 
             $where[] = "Products.id IN (
-                SELECT product_id 
-                FROM Product_Flavours 
-                WHERE flavour IN (" . implode(',', $placeholders) . ")
-                GROUP BY product_id 
-                HAVING COUNT(DISTINCT flavour) = :flavourCount
+                SELECT Product_id 
+                FROM Product_Flavours
+                WHERE Flavour IN (" . implode(',', $placeholders) . ")
+                GROUP BY Product_id 
+                HAVING COUNT(DISTINCT Flavour) = :flavourCount
             )";
             $params['flavourCount'] = count($flavours);
         } else {

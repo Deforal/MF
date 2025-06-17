@@ -262,7 +262,67 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener('DOMContentLoaded', () => {
     const page = document.querySelector(".catalog");
     if (!page) return;
-    
+
+    function sortSizeOptions(options) {
+        function normalizeValue(str) {
+            return str.toLowerCase().replace(',', '.').trim();
+        }
+
+        function parseSizeToLb(str) {
+            str = normalizeValue(str);
+            const patterns = [
+                { regex: /([\d.]+)\s*(pound|lb|lbs|фунт|пуд)/, multiplier: 1 },
+                { regex: /([\d.]+)\s*(kilogram|килограмм|кг)/, multiplier: 2.20462 },
+                { regex: /([\d.]+)\s*(gram|грамм|г)/, multiplier: 0.00220462 },
+            ];
+            for (const { regex, multiplier } of patterns) {
+                const match = str.match(regex);
+                if (match) return parseFloat(match[1]) * multiplier;
+            }
+            return null;
+        }
+
+        function extractLeadingNumber(str) {
+            const match = str.match(/^\s*(\d+(?:[\.,]\d+)?)/);
+            return match ? parseFloat(match[1].replace(',', '.')) : null;
+        }
+
+        // Step 1: Merge normalized duplicates
+        const mergedMap = new Map();
+
+        for (const option of options) {
+            const normalized = normalizeValue(option.value);
+            if (mergedMap.has(normalized)) {
+                mergedMap.get(normalized).count += option.count;
+            } else {
+                mergedMap.set(normalized, { value: normalized, count: option.count });
+            }
+        }
+
+        const mergedArray = Array.from(mergedMap.values());
+
+        // Step 2: Sort merged array
+        mergedArray.sort((a, b) => {
+            const aVal = parseSizeToLb(a.value);
+            const bVal = parseSizeToLb(b.value);
+            if (aVal !== null && bVal !== null) return aVal - bVal;
+            if (aVal !== null) return -1;
+            if (bVal !== null) return 1;
+
+            const aNum = extractLeadingNumber(a.value);
+            const bNum = extractLeadingNumber(b.value);
+            if (aNum !== null && bNum !== null) return aNum - bNum;
+            if (aNum !== null) return -1;
+            if (bNum !== null) return 1;
+
+            return a.value.localeCompare(b.value);
+        });
+
+        return mergedArray;
+    }
+
+
+
     // Load filters and render them
     fetch('./php/get_filters.php')
         .then(response => response.json())
@@ -270,6 +330,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const filtersContainer = document.getElementById('filters');
             filtersContainer.innerHTML = '';
 
+            // SORT "Вес" OPTIONS
+            if (data["Вес"]) {
+                data["Вес"] = sortSizeOptions(data["Вес"]);
+            }
             for (const [filterName, options] of Object.entries(data)) {
                 const fieldset = document.createElement('fieldset');
                 const legend = document.createElement('legend');
@@ -277,13 +341,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 fieldset.appendChild(legend);
                 options.forEach(option => {
                     const label = document.createElement('label');
-                    const input = document.createElement('input');
-                    input.type = (filterName === 'Вкус') ? 'checkbox' : 'radio';
-                    input.name = filterName;
-                    input.value = option.value;
-
-                    label.appendChild(input);
-                    label.append(` ${option.value} (${option.count})`);
+                    label.innerHTML = `
+                    <label class="custom-${(filterName === 'Вкус') ? 'checkbox' : 'radio'}">
+                        <input type="${(filterName === 'Вкус') ? 'checkbox' : 'radio'}" name="${filterName}" value="${option.value}" />
+                        <span></span>
+                        ${option.value} (${option.count})
+                    </label>`
                     fieldset.appendChild(label);
                 });
 
@@ -326,6 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => console.error('Error fetching filters:', error));
 });
 
+
 function gatherFilters() {
     const filters = {};
     document.querySelectorAll('#filters fieldset').forEach(fieldset => {
@@ -350,7 +414,7 @@ function gatherFilters() {
 function fetchFilteredProducts(filters) {
     const sortSelect = document.getElementById('sort-select');
     const sortValue = sortSelect.value;
-
+    
     if (sortValue) {
         filters['sort'] = sortValue;
     }

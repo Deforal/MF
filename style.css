@@ -689,12 +689,10 @@ select {
   padding-bottom: 15px;
   margin-bottom: 10px;
 }
-.catalog__side_menu div {
+.catalog__side_menu #filters {
   border-bottom: #000000 1px solid;
   padding-bottom: 15px;
   margin-bottom: 10px;
-}
-.catalog__side_menu #filters {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -722,6 +720,57 @@ select {
 .catalog__side_menu #filters fieldset label:hover {
   background-color: #000000;
   color: #fff;
+}
+.catalog__side_menu #filters .custom-checkbox input,
+.catalog__side_menu #filters .custom-radio input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+.catalog__side_menu #filters .custom-radio span,
+.catalog__side_menu #filters .custom-checkbox span {
+  flex-shrink: 0;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  vertical-align: middle;
+  position: relative;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+.catalog__side_menu #filters .custom-radio span {
+  border-radius: 50%;
+}
+.catalog__side_menu #filters .custom-checkbox input:checked + span::after,
+.catalog__side_menu #filters .custom-radio input:checked + span::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.catalog__side_menu #filters .custom-checkbox input:checked + span::after {
+  width: 10px;
+  height: 10px;
+  background-color: #000000;
+  border-radius: 2px;
+}
+.catalog__side_menu #filters .custom-radio input:checked + span::after {
+  width: 10px;
+  height: 10px;
+  background-color: #000000;
+  border-radius: 50%;
+}
+@media (max-width: 800px) {
+  .catalog__side_menu #filters .custom-checkbox,
+  .catalog__side_menu #filters .custom-radio {
+    font-size: 14px;
+  }
 }
 .catalog__side_menu button {
   height: 60px;

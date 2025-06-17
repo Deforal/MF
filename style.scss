@@ -674,12 +674,10 @@ select {
             padding-bottom: 15px;
             margin-bottom: 10px;
         }
-        & div {
+        & #filters {
             border-bottom: #000000 1px solid;
             padding-bottom: 15px;
             margin-bottom: 10px;
-        }
-        & #filters {
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -704,6 +702,63 @@ select {
                         background-color: #000000;
                         color: #fff;
                     }
+                }
+            }
+            
+            .custom-checkbox input,
+            .custom-radio input {
+                position: absolute;
+                opacity: 0;
+                pointer-events: none;
+                width: 0;
+                height: 0;
+            }
+
+            .custom-radio span,
+            .custom-checkbox span {
+                flex-shrink: 0;
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                border: 2px solid #000000;
+                border-radius: 4px;
+                vertical-align: middle;
+                position: relative;
+                background-color: #ffffff;
+                transition: all 0.2s ease;
+                box-sizing: border-box;
+            }
+
+            .custom-radio span {
+                border-radius: 50%;
+            }
+
+            .custom-checkbox input:checked + span::after,
+            .custom-radio input:checked + span::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .custom-checkbox input:checked + span::after {
+                width: 10px;
+                height: 10px;
+                background-color: #000000;
+                border-radius: 2px;
+            }
+
+            .custom-radio input:checked + span::after {
+                width: 10px;
+                height: 10px;
+                background-color: #000000;
+                border-radius: 50%;
+            }
+            @media (max-width: 800px) {
+                .custom-checkbox ,
+                .custom-radio {
+                    font-size: 14px;
                 }
             }
         }
